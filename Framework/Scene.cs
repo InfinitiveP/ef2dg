@@ -5,14 +5,14 @@ namespace ef2dg
     public abstract class Scene
     {
         public string InstanceName { get; set; } = "";
-        // Файл, из которого сцена загружена или в который сохранена последней (для File → Save / Ctrl+S)
+        // File the scene was loaded from or last saved to (for File → Save / Ctrl+S)
         public string FilePath { get; set; } = "";
         public Tilemap Map { get; set; } = null!;
-        // Список всех объектов на сцене
+        // List of every object in the scene
         public List<GameObject> Entities { get; protected set; } = new List<GameObject>();
         public Camera? ActiveCamera { get; set; }
         public float SimulationPadding { get; set; } = 8.0f;
-        // Освещение этой локации (окно Lighting), сохраняется вместе с уровнем
+        // Lighting of this location (Lighting window), saved with the level
         public SceneLighting Lighting { get; set; } = new SceneLighting();
 
         private bool IsInSimulationZone(GameObject entity)
@@ -37,9 +37,9 @@ namespace ef2dg
             for (int i = Entities.Count - 1; i >= 0; i--)
             {
                 if (Engine.Instance.IsTransitionActive) break;
-                // Компоненты могут удалить сущность при загрузке runtime-состояния
-                // или при выполнении очереди мутаций. В таком случае исходный индекс
-                // уже может выходить за новые границы списка.
+                // Components may remove an entity while loading runtime state
+                // or while running a mutation queue. In that case the original index
+                // may already be past the new end of the list.
                 if (i >= Entities.Count) continue;
                 var entity = Entities[i];
                 if (IsInSimulationZone(entity))
@@ -49,7 +49,7 @@ namespace ef2dg
             }
         }
 
-        // Метод для загрузки ресурсов уровня
+        // Method for loading level resources
         public abstract void Load(ResourceManager resources, Silk.NET.Input.IInputContext input);
 
         public virtual void Update(float deltaTime)
@@ -58,8 +58,8 @@ namespace ef2dg
             for (int i = Entities.Count - 1; i >= 0; i--)
             {
                 if (Engine.Instance.IsTransitionActive) break;
-                // Список разрешено изменять из компонентов текущего кадра. Проверка
-                // сохраняет обратный проход безопасным после удаления сущностей.
+                // Components may modify the list during the current frame. The check
+                // keeps the backward pass safe after entities are removed.
                 if (i >= Entities.Count) continue;
                 var entity = Entities[i];
                 if (IsInSimulationZone(entity))
@@ -69,7 +69,7 @@ namespace ef2dg
             }
         }
 
-        // Engine вызывает фазы по отдельности, чтобы наложить освещение между миром и HUD
+        // Engine calls the phases separately to apply lighting between the world and the HUD
         public virtual void Draw(SpriteRenderer renderer, Camera camera)
         {
             DrawWorld(renderer, camera);
@@ -77,12 +77,12 @@ namespace ef2dg
             DrawUI(renderer, camera);
         }
 
-        // Тайлы, игровые объекты и Foreground — освещение применяется только к этому слою
+        // Tiles, game objects and Foreground — lighting is applied only to this layer
         public virtual void DrawWorld(SpriteRenderer renderer, Camera camera)
         {
             if (Map != null)
             {
-                // 1. Рисуем все слои карты, КРОМЕ Foreground (т.е. Background и Ground)
+                // 1. Draw every map layer EXCEPT Foreground (i.e. Background and Ground)
                 for (int i = 0; i < Map.Layers.Count; i++)
                 {
                     if (Map.Layers[i].Name != "Foreground")
@@ -90,7 +90,7 @@ namespace ef2dg
                 }
             }
 
-            // --- РАСЧЕТ ЗОНЫ ВИДИМОСТИ ДЛЯ ИГРОВЫХ ОБЪЕКТОВ ---
+            // --- VISIBILITY AREA FOR GAME OBJECTS ---
             float camHalfW = camera.ViewWidth / 2f;
             float camHalfH = camera.ViewHeight / 2f;
             float cullPadding = 2.0f; 
@@ -100,12 +100,12 @@ namespace ef2dg
             float camBottom = camera.Position.Y - camHalfH - cullPadding;
             float camTop = camera.Position.Y + camHalfH + cullPadding;
 
-            // 2. РИСУЕМ МИР: только НЕ-интерфейсные объекты с отсечением невидимого
+            // 2. DRAW THE WORLD: only NON-UI objects, culling invisible ones
             foreach (var entity in Entities)
             {
                 if (!entity.IsUI)
                 {
-                    // Проверяем, находится ли объект в пределах камеры
+                    // Check whether the object is inside the camera bounds
                     if (entity.Position.X >= camLeft && entity.Position.X <= camRight &&
                         entity.Position.Y >= camBottom && entity.Position.Y <= camTop)
                     {
@@ -116,7 +116,7 @@ namespace ef2dg
 
             if (Map != null)
             {
-                // 3. Рисуем слой Foreground (перекрывает игровой мир)
+                // 3. Draw the Foreground layer (covers the game world)
                 for (int i = 0; i < Map.Layers.Count; i++)
                 {
                     if (Map.Layers[i].Name == "Foreground")
@@ -125,17 +125,17 @@ namespace ef2dg
             }
         }
 
-        // Отладочные гизмо: поверх освещения, чтобы не терялись в темноте, но под HUD
+        // Debug gizmos: above lighting so they do not get lost in the dark, but below the HUD
         public virtual void DrawEditorOverlay(SpriteRenderer renderer, Camera camera) { }
 
         public virtual void DrawUI(SpriteRenderer renderer, Camera camera)
         {
-            // 4. РИСУЕМ ИНТЕРФЕЙС (HUD) поверх всего остального
+            // 4. DRAW THE INTERFACE (HUD) on top of everything else
 
             var tempPos = camera.Position;
             var tempZoom = camera.Zoom;
 
-            // Фиксируем камеру по центру экрана для UI
+            // Pin the camera to the screen centre for UI
             camera.Position = new Silk.NET.Maths.Vector3D<float>(0, 0, 3.0f);
             camera.Zoom = 1.0f;
 
@@ -143,12 +143,12 @@ namespace ef2dg
             {
                 if (entity.IsUI)
                 {
-                    // Для UI не делаем проверку видимости (culling), так как он привязан к экрану
+                    // UI is not culled because it is attached to the screen
                     entity.Draw(renderer, camera);
                 }
             }
 
-            // Возвращаем игровую камеру на место
+            // Restore the game camera
             camera.Position = tempPos;
             camera.Zoom = tempZoom;
         }

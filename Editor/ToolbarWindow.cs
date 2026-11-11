@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace ef2dg
 {
-    // Дополнительная панель кнопок. Те же действия есть в главном меню (File/Edit/Run), поэтому по умолчанию она скрыта.
+    // Extra button panel. The same actions are in the main menu (File/Edit/Run), so it is hidden by default.
     public class ToolbarWindow : EditorWindow
     {
         public override string Title => "Toolbar";
@@ -11,7 +11,7 @@ namespace ef2dg
         public override void Draw(EditorContext ctx, EditorState state)
         {
             ImGui.SetNextWindowPos(new Vector2(600, 60), ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSize(new Vector2(399, 65)); // Сделали окно чуть шире
+            ImGui.SetNextWindowSize(new Vector2(399, 65)); // Made the window a bit wider
             ImGui.Begin(Title, ref IsOpen, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize);
 
             if (ImGui.Button(state.IsPlayMode ? "STOP" : "PLAY", new Vector2(70, 30))) EditorCommands.TogglePlayMode(ctx, state);

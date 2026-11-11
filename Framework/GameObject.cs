@@ -19,7 +19,7 @@ namespace ef2dg
         {
             component.Owner = this;
             
-            _components[typeof(T)] = component; // O(1) запис
+            _components[typeof(T)] = component; // O(1) write
             
             component.Start();
             return component;
@@ -29,30 +29,30 @@ namespace ef2dg
         {
             if (_components.TryGetValue(typeof(T), out var component))
             {
-                return (T)component; // O(1) пошук
+                return (T)component; // O(1) lookup
             }
             return null;
         }
 
         public void RemoveComponent(Component component)
         {
-            // ВАЖНО: Если твой внутренний список компонентов называется не _components, 
-            // а, например, Components, замени название здесь:
+            // IMPORTANT: if your internal component list is not called _components,
+            // but, for example, Components, change the name here:
             if (component != null)
             {
                 _components.Remove(component.GetType()); 
             }
         }
 
-        // Метод для сериализатора
+        // Method for the serializer
         public void AddComponentDynamic(Component component, Type type)
         {
             component.Owner = this;
-            _components[type] = component; // Сохраняем в словарь по типу
+            _components[type] = component; // Store in the dictionary by type
             component.Start();
         }
 
-        // Выдает список всех компонентов, которые висят на этом объекте
+        // Returns every component attached to this object
         public System.Collections.Generic.IEnumerable<Component> GetAllComponents() => _components.Values;
 
         public void OnTriggerEnter(GameObject other)
@@ -89,7 +89,7 @@ namespace ef2dg
 
         public void Update(float deltaTime)
         {
-            // Перебираем только значения словаря
+            // Iterate over the dictionary values only
             foreach (var component in _components.Values)
             {
                 component.Update(deltaTime);

@@ -8,11 +8,11 @@ namespace ef2dg
 
     public abstract class Component
     {
-        // Ссылка на объект, к которому прикреплен этот компонент
+        // Reference to the object this component is attached to
         public GameObject Owner { get; internal set; } = null!;
 
         // ==========================================
-        // БАЗОВЫЕ СОКРАЩЕНИЯ (ДЛЯ ЧИСТОТЫ КОДА)
+        // BASIC SHORTCUTS (FOR CLEANER CODE)
         // ==========================================
         protected Vector2D<float> Position
         {
@@ -23,7 +23,7 @@ namespace ef2dg
         protected SpriteComponent? Sprite => Owner?.GetComponent<SpriteComponent>();
         protected PhysicsBody? Physics => Owner?.GetComponent<PhysicsBody>();
 
-        // Виртуальные методы
+        // Virtual methods
         public virtual void Start() { }
         public virtual void Update(float deltaTime) { }
         public virtual void FixedUpdate(float fixedDeltaTime) { }

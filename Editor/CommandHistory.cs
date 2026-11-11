@@ -2,25 +2,25 @@ using System.Collections.Generic;
 
 namespace ef2dg
 {
-    // Базовый интерфейс для ЛЮБОГО действия в редакторе
+    // Base interface for ANY editor action
     public interface ICommand
     {
-        void Execute(); // Выполнить действие
-        void Undo();    // Откатить действие
+        void Execute(); // Perform the action
+        void Undo();    // Undo the action
     }
 
-    // Менеджер истории, который будет жить в EditorState
+    // History manager that lives in EditorState
     public class CommandHistory
     {
         private Stack<ICommand> _undoStack = new Stack<ICommand>();
         private Stack<ICommand> _redoStack = new Stack<ICommand>();
 
-        // Выполнить новую команду и записать в историю
+        // Execute a new command and record it in the history
         public void ExecuteCommand(ICommand command)
         {
             command.Execute();
             _undoStack.Push(command);
-            _redoStack.Clear(); // Если сделали новое действие, старые Redo сгорают
+            _redoStack.Clear(); // A new action discards the old Redo entries
         }
 
         public void Undo()

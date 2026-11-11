@@ -8,9 +8,9 @@ namespace ef2dg
         public Vector2D<float> Size { get; set; } = new Vector2D<float>(1f, 1f);
         public Vector2D<float> Offset { get; set; } = new Vector2D<float>(0f, 0f);
         
-        // ВАЖНО ДЛЯ БУДУЩЕЙ СИСТЕМЫ ИВЕНТОВ:
-        // Если true  -> Игрок не упирается, проходит насквозь (зона квеста, телепорт)
-        // Если false -> Работает как твердое статическое препятствие (дерево, камень)
+        // IMPORTANT FOR THE FUTURE EVENT SYSTEM:
+        // If true  -> the player is not blocked and passes through (quest zone, teleport)
+        // If false -> intended as a solid static obstacle (tree, rock)
         public bool IsTrigger { get; set; } = false;
 
         public override void Start() 
@@ -27,16 +27,16 @@ namespace ef2dg
 
         public override void Draw(SpriteRenderer renderer, Camera camera) 
         { 
-            // Обычная отрисовка (игровая) здесь не нужна, коллайдеры невидимы
+            // Regular (in-game) drawing is not needed here; colliders are invisible
         }
 
-        // Метод отрисовки для дебага и редактора
+        // Drawing method for debugging and the editor
         public void DrawDebug(SpriteRenderer renderer, Camera camera, Vector4D<float> color)
         {
             float posX = Owner.Position.X + Offset.X;
             float posY = Owner.Position.Y + Offset.Y;
             
-            // Если у тебя в SpriteRenderer метод называется DrawCollisionBox, используем его:
+            // SpriteRenderer provides DrawCollisionBox for this:
             renderer.DrawCollisionBox(new Vector2D<float>(posX, posY), Size, camera, color);
         }
     }

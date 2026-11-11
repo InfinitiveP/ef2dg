@@ -13,7 +13,7 @@ namespace ef2dg
         public List<Scene> OpenedScenes { get; set; } = new List<Scene>();
 
         // ==========================================
-        // НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ РЕДАКТОРА УРОВНЕЙ
+        // LEVEL EDITOR VARIABLES
         // ==========================================
         public CommandHistory History { get; set; } = new CommandHistory();
         
@@ -24,15 +24,15 @@ namespace ef2dg
         public string SelectedTilePath { get; set; } = "";
         public string CurrentAssetFolder { get; set; } = "assets";
 
-        // Координаты клетки для отрисовки кисти
+        // Cell coordinates for drawing the brush
         public Vector2D<int>? HoveredGridCell { get; set; } = null;
         public string AudioSearchFilter { get; set; } = "";
-        public string NewAudioKey { get; set; } = ""; // Для создания новых ключей SFX
+        public string NewAudioKey { get; set; } = ""; // For creating new SFX keys
         public int NewAudioFrame { get; set; } = 3;
         public string NewAudioSfxKey { get; set; } = "Hit";
         public float EditorCameraZoom { get; set; } = 1.0f;
 
-        // Запросы на открытие диалогов файлов (из меню File, Toolbar и горячих клавиш)
+        // Requests to open file dialogs (from the File menu, the Toolbar and hotkeys)
         public bool RequestSaveAsDialog { get; set; } = false;
         public bool RequestOpenDialog { get; set; } = false;
     }

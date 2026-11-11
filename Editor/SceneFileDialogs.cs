@@ -7,19 +7,19 @@ using System.Text.Json;
 
 namespace ef2dg
 {
-    // Диалоги сохранения и загрузки уровней. Открываются флагами EditorState из меню File, Toolbar и горячих клавиш.
+    // Dialogs for saving and loading levels. Opened by EditorState flags from the File menu, the Toolbar and hotkeys.
     public class SceneFileDialogs
     {
-        // JSON-файлы рядом с уровнями, которые не являются сценами
+        // JSON files next to levels that are not scenes
         private static readonly string[] NonSceneFiles =
         {
             "bindings.json", "level_backup.json", "project_config.json", "lighting_presets.json", EditorLayout.SettingsFileName
         };
 
-        // Имя файла по умолчанию
+        // Default file name
         private string _fileNameInput = "level.json";
 
-        // Ctrl+S: сохраняет в файл, из которого сцена загружена, иначе открывает «Сохранить как»
+        // Ctrl+S: saves to the file the scene was loaded from, otherwise opens "Save As"
         public static void QuickSave(EditorContext ctx, EditorState state)
         {
             var scene = ctx.CurrentScene;
@@ -64,15 +64,15 @@ namespace ef2dg
             if (ImGui.IsWindowAppearing()) ImGui.SetKeyboardFocusHere();
             bool submitted = ImGui.InputText("##savefile", ref _fileNameInput, 128, ImGuiInputTextFlags.EnterReturnsTrue);
 
-            // Если пользователь забыл написать .json, добавляем автоматически
+            // If the user forgot to type .json, add it automatically
             if (!_fileNameInput.EndsWith(".json")) _fileNameInput += ".json";
 
             if (ImGui.Button("Confirm Save", new Vector2(125, 0)) || submitted)
             {
-                // Безопасно работаем только если сцена действительно существует
+                // Work only if the scene really exists
                 if (ctx.CurrentScene != null)
                 {
-                    // Сохраняем имя файла в саму сцену перед сериализацией
+                    // Store the file name in the scene itself before serialization
                     string cleanName = Path.GetFileNameWithoutExtension(_fileNameInput);
                     ctx.CurrentScene.InstanceName = cleanName;
 
@@ -96,7 +96,7 @@ namespace ef2dg
             ImGui.SetNextItemWidth(260);
             bool submitted = ImGui.InputText("##loadfile", ref _fileNameInput, 128, ImGuiInputTextFlags.EnterReturnsTrue);
 
-            // Выводим список всех доступных файлов уровней в папке
+            // List every available level file in the folder
             ImGui.Separator();
             ImGui.TextDisabled("Available levels:");
 
@@ -107,7 +107,7 @@ namespace ef2dg
                 {
                     string fileName = Path.GetFileName(file);
 
-                    // Пропускаем системные файлы
+                    // Skip system files
                     if (NonSceneFiles.Contains(fileName)) continue;
 
                     if (ImGui.Selectable(fileName, fileName == _fileNameInput, ImGuiSelectableFlags.AllowDoubleClick))
@@ -127,7 +127,7 @@ namespace ef2dg
             ImGui.SameLine();
             if (ImGui.Button("Cancel", new Vector2(125, 0))) ImGui.CloseCurrentPopup();
 
-            // Модальное окно ошибки открывается поверх диалога загрузки
+            // The error modal opens on top of the load dialog
             if (ImGui.BeginPopupModal("LoadError", ImGuiWindowFlags.AlwaysAutoResize))
             {
                 ImGui.TextColored(new Vector4(1, 0, 0, 1), "ERROR: Failed to load level!");
@@ -148,12 +148,12 @@ namespace ef2dg
                 string json = File.ReadAllText(fileName);
                 using var doc = JsonDocument.Parse(json);
 
-                // Читаем метаданные прямо из JSON
+                // Read the metadata straight from the JSON
                 string sTypeStr = doc.RootElement.TryGetProperty("SceneType", out var st) ? st.GetString() ?? "GameScene" : "GameScene";
                 string targetCleanName = Path.GetFileNameWithoutExtension(fileName);
                 string instanceNameStr = doc.RootElement.TryGetProperty("InstanceName", out var inProp) ? inProp.GetString() ?? targetCleanName : targetCleanName;
 
-                // 1. ИЩЕМ СУЩЕСТВУЮЩУЮ ВКЛАДКУ ПО ИМЕНИ
+                // 1. LOOK FOR AN EXISTING TAB BY NAME
                 Scene? existingScene = state.OpenedScenes.FirstOrDefault(s =>
                     s.InstanceName == instanceNameStr ||
                     s.InstanceName == targetCleanName ||
@@ -161,33 +161,33 @@ namespace ef2dg
 
                 Scene targetSceneToLoad;
 
-                // 2. СЛИЯНИЕ ИЛИ СОЗДАНИЕ
+                // 2. MERGE OR CREATE
                 if (existingScene != null && existingScene.GetType().Name == sTypeStr)
                 {
-                    // Используем уже открытую сцену, не создавая дубликат
+                    // Use the already opened scene without creating a duplicate
                     targetSceneToLoad = existingScene;
-                    targetSceneToLoad.Entities.Clear(); // Вычищаем старых энтити
+                    targetSceneToLoad.Entities.Clear(); // Clear the old entities
                 }
                 else
                 {
-                    // Создаем новую только если такой вкладки физически нет
+                    // Create a new one only if no such tab exists
                     Type? sceneType = Type.GetType($"ef2dg.{sTypeStr}");
                     targetSceneToLoad = (sceneType != null)
                         ? (Scene)Activator.CreateInstance(sceneType)!
                         : new GameScene();
 
-                    state.OpenedScenes.Add(targetSceneToLoad); // Регистрируем новую вкладку
+                    state.OpenedScenes.Add(targetSceneToLoad); // Register the new tab
                 }
 
                 if (targetSceneToLoad is GameScene gs) gs.IsLoadedFromFile = true;
                 targetSceneToLoad.InstanceName = instanceNameStr;
                 targetSceneToLoad.Map = new Tilemap(0.5f);
 
-                // Заливаем данные
+                // Load the data
                 if (!SceneSerializer.Load(targetSceneToLoad, fileName, ctx.Resources)) return false;
 
                 state.SelectedEntity = null;
-                // Переключаем фокус на обновленную вкладку
+                // Switch focus to the updated tab
                 ctx.ChangeScene?.Invoke(targetSceneToLoad);
                 return true;
             }

@@ -13,7 +13,7 @@ namespace ef2dg
 
         public Dictionary<string, string> SoundClips { get; set; } = new();
 
-        // Флаг, гарантирующий, что трек запустится ровно один раз при входе в Play Mode
+        // Flag that guarantees the track starts exactly once when entering Play Mode
         private bool _startedInPlayMode = false;
 
         public string SoundClipsJson
@@ -24,13 +24,13 @@ namespace ef2dg
 
         public override void Start()
         {
-            // Оставляем пустым, так как в Editor Mode музыка при старте не нужна
+            // Left empty: music is not needed at startup in Editor Mode
         }
 
         public override void Update(float deltaTime)
         {
             // =========================================================
-            // АВТОЗАПУСК ПРИ СТАРТЕ РЕЖИМА ИГРЫ
+            // AUTOPLAY WHEN PLAY MODE STARTS
             // =========================================================
             if (PlayOnStart && !_startedInPlayMode && !string.IsNullOrEmpty(DefaultSoundPath))
             {
@@ -47,7 +47,7 @@ namespace ef2dg
             }
         }
 
-        // Позволяет сбросить триггер (например, если потребуется перезапустить сцену)
+        // Resets the trigger (for example, if the scene needs to be restarted)
         public void ResetPlayState()
         {
             _startedInPlayMode = false;

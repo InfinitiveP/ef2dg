@@ -21,7 +21,7 @@ namespace ef2dg
     {
         private EditorState _state = new EditorState();
 
-        // Инициализируем наши независимые классы-окна
+        // Initialize our independent window classes
         private ToolbarWindow _toolbar = new ToolbarWindow();
         private HierarchyWindow _hierarchy = new HierarchyWindow();
         private SceneViewWindow _sceneView = new SceneViewWindow();
@@ -42,7 +42,7 @@ namespace ef2dg
 
         public EditorUI()
         {
-            // Порядок важен: окна рисуются в нём же (Scene View выбирает объект до Inspector), и так же идут в меню View
+            // Order matters: windows are drawn in this order (Scene View picks an object before the Inspector), and the View menu lists them the same way
             _windows = new List<EditorWindow>
             {
                 _hierarchy, _sceneView, _inspector, _lighting, _assetBrowser,
@@ -58,7 +58,7 @@ namespace ef2dg
             if (ctx.CurrentScene == null) return;
 
             _menuBar.HandleShortcuts(ctx, _state);
-            // Меню первым: оно резервирует верх экрана, и область докинга занимает оставшееся место
+            // Menu first: it reserves the top of the screen, and the docking area takes the remaining space
             _menuBar.Draw(ctx, _state, _windows, _layout);
             _layout.DrawDockHost(() => _fileDialogs.Draw(ctx, _state));
             _layout.DrawStatusBar(ctx, _state);

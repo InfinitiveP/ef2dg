@@ -4,26 +4,24 @@
 
 Every scene (location) has its own `SceneLighting` settings. They are stored in the level JSON in the `Lighting` field and saved with `File → Save` (`Ctrl+S`). Light sources are objects with a [LightComponent](../03_Modules/Component%20Catalog.md#lightcomponent).
 
-> [!NOTE]
-> The Lighting window and its presets currently have Russian labels. The original label is given first, with its English meaning in parentheses.
-
 ## Quick location setup
 
 1. Open the **Lighting** window.
-2. Pick a location preset in the drop-down: «Бездна (фиолетовая)» (Abyss, purple), «Подземелье с факелами» (torch-lit dungeon), «Пещера» (cave), «Лунная ночь» (moonlit night), «Закат» (sunset), «Ядовитое болото» (toxic swamp), «Преисподняя» (underworld), «День» (day). Lighting is enabled automatically.
-3. Press **+ Добавить источник света** (add light source) and choose a type: torch, candle, magic orb, crystal, toxic glow, lava, moonlight, player aura. The object appears in the centre of the camera and can be dragged with the mouse.
+2. Pick a preset in the **Apply a location preset...** list: `Abyss (purple)`, `Torch-lit dungeon`, `Cave`, `Moonlit night`, `Sunset`, `Toxic swamp`, `Underworld`, `Day (no darkening)`. Lighting is enabled automatically.
+3. Press **+ Add light source** and choose a type: `Torch`, `Candle`, `Magic orb`, `Crystal`, `Toxic glow`, `Lava`, `Moonlight`, `Player aura`. The object appears in the centre of the camera and can be dragged with the mouse.
 4. Fine-tune the source in the **Inspector**, and the overall look with the sliders in the Lighting window.
-5. Save the level (`Ctrl+S`). To reuse the same look on other levels of the location, enter a name and press **Сохранить пресет** (save preset): it goes into `lighting_presets.json` and appears in the preset list. To delete a preset, right-click the list.
+5. Save the level (`Ctrl+S`). To reuse the same look on other levels of the location, enter a name and press **Save preset**: it goes into `lighting_presets.json` and appears in the **Saved** group of the preset list. To delete a preset, right-click the list.
 
-The **В редакторе** (in editor) checkbox hides lighting outside Play Mode when darkness makes object placement inconvenient. In Play Mode lighting is always on if the scene has it enabled.
+The **In editor** checkbox hides lighting outside Play Mode when darkness makes object placement inconvenient. In Play Mode lighting is always on if the scene has it enabled (**Enable lighting**).
 
 ## Scene settings
 
-- **Темнота** (darkness) — `AmbientColor` and `AmbientIntensity`: the scene colour where no light source reaches. White means no darkening.
-- **Яркость всех** (overall brightness) — `LightMultiplier`, a global multiplier for the scene's sources.
-- **Свечение (Bloom)** — `BloomStrength`, `BloomThreshold`, `BloomRadius`: a soft halo around bright pixels.
-- **Цветокоррекция** (colour grading) — `Exposure`, `Contrast`, `Saturation`, `Tint`.
-- **Виньетка** (vignette) — `VignetteStrength`, `VignetteSize`, `VignetteColor`.
+- **Darkness (ambient light)** — `AmbientColor` and `AmbientIntensity`: the scene colour where no light source reaches. White means no darkening.
+- **Light sources → Overall brightness** — `LightMultiplier`, a global multiplier for the scene's sources.
+- **Glow (Bloom)** — `BloomStrength`, `BloomThreshold`, `BloomRadius`: a soft halo around bright pixels.
+- **Color grading** — `Exposure`, `Contrast`, `Saturation`, `Tint`.
+- **Vignette** — `VignetteStrength`, `VignetteSize`, `VignetteColor`.
+- **Reset scene settings** — restore the scene's default settings; the **Enable lighting** flag is kept.
 
 ## Light source settings
 

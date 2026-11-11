@@ -23,7 +23,7 @@ namespace ef2dg
             }
             ImGui.Separator();
 
-            // Переменные для безопасного отложенного изменения списка вне цикла ImGui
+            // Variables for safely deferring list changes outside the ImGui loop
             int swapIndexA = -1;
             int swapIndexB = -1;
             int removeIndex = -1;
@@ -39,7 +39,7 @@ namespace ef2dg
 
                 ImGui.PushID(i);
 
-                // Высота строки = высота иконок, иначе текст не по центру кнопок
+                // Row height = icon height, otherwise the text is not centred on the buttons
                 ImGui.SetNextItemAllowOverlap();
                 if (ImGui.Selectable($"{entity.Name}##sel{i}", isSelected, ImGuiSelectableFlags.None,
                         new Vector2(0f, ImGui.GetTextLineHeight() + 2f)))
@@ -48,12 +48,12 @@ namespace ef2dg
                 }
                 bool rowHovered = ImGui.IsMouseHoveringRect(ImGui.GetItemRectMin(), ImGui.GetItemRectMax());
 
-                // Двойной клик для фокуса камеры на объекте
+                // Double click focuses the camera on the object
                 if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                 {
                     if (ctx.GameCamera != null)
                     {
-                        // Перемещаем X и Y камеры, оставляя высоту Z без изменений
+                        // Move the camera's X and Y, keeping the Z height unchanged
                         ctx.GameCamera.Position = new Vector3D<float>(
                             entity.Position.X,
                             entity.Position.Y,
@@ -62,11 +62,11 @@ namespace ef2dg
                     }
                 }
 
-                // Кнопки управления порядком и удаления по правому краю; яркие у строки под курсором и у выбранной
+                // Reorder and delete buttons on the right edge; bright for the hovered and the selected row
                 bool dimmed = !rowHovered && !isSelected;
                 ImGui.SameLine(ImGui.GetWindowContentRegionMax().X - actionsWidth);
 
-                // Вверх — сдвинуть на задний план / к началу списка
+                // Up — move to the background / towards the start of the list
                 if (EditorIcons.Button("##up", EditorIcon.ChevronUp, "Move up (draw behind)", i > 0, dimmed))
                 {
                     swapIndexA = i;
@@ -74,7 +74,7 @@ namespace ef2dg
                 }
 
                 ImGui.SameLine(0f, spacing);
-                // Вниз — сдвинуть на передний план / к концу списка
+                // Down — move to the foreground / towards the end of the list
                 if (EditorIcons.Button("##down", EditorIcon.ChevronDown, "Move down (draw in front)", i < entityCount - 1, dimmed))
                 {
                     swapIndexA = i;
@@ -90,7 +90,7 @@ namespace ef2dg
                 ImGui.PopID();
             }
 
-            // Безопасное выполнение перестановок и удалений
+            // Safely perform reorders and deletions
             if (swapIndexA != -1 && swapIndexB != -1)
             {
                 var temp = ctx.CurrentScene.Entities[swapIndexA];

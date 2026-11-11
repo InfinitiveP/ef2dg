@@ -55,7 +55,7 @@ namespace ef2dg
 
         private int _lastSoundFrame = -1;
         
-        // НОВОЕ: Публичный доступ к имени текущей анимации для Контроллера
+        // Public access to the current animation name for the controller
         public string CurrentAnimationName => _currentAnimationName;
 
         public int TotalFrames => Texture != null && FrameWidth > 0 ? Texture.Width / FrameWidth : 1;
@@ -77,7 +77,7 @@ namespace ef2dg
 
         public SpriteComponent() { }
 
-        // --- ИСПРАВЛЕНИЕ ЗАДЕРЖКИ: Сразу проверяем переходы ---
+        // --- DELAY FIX: check transitions immediately ---
         public void SetFloat(string name, float value)
         {
             if (!Parameters.ContainsKey(name)) Parameters[name] = new AnimatorParameter { Name = name, Type = ParameterType.Float };
@@ -96,7 +96,7 @@ namespace ef2dg
         {
             if (!Parameters.ContainsKey(name)) Parameters[name] = new AnimatorParameter { Name = name, Type = ParameterType.Trigger };
             Parameters[name].TriggerValue = true;
-            CheckTransitions(); // Аниматор реагирует МГНОВЕННО
+            CheckTransitions(); // The animator reacts INSTANTLY
         }
 
         public void Play(string name, bool force = false)
@@ -115,7 +115,7 @@ namespace ef2dg
             _currentAnimationName = name;
             IsAnimationFinished = false;
             
-            _lastSoundFrame = -1; // ИСПРАВЛЕНИЕ: Сбрасываем звуковой трекер при новой анимации
+            _lastSoundFrame = -1; // Fix: reset the sound tracker on a new animation
         }
 
         public override void Update(float deltaTime)
@@ -125,16 +125,16 @@ namespace ef2dg
             if (IsAnimationFinished && !IsLooping) return;
 
             // =========================================================
-            // НОВОЕ: ПРОВЕРКА ЗВУКОВОГО СОБЫТИЯ В ТЕКУЩЕМ КАДРЕ
+            // SOUND EVENT CHECK FOR THE CURRENT FRAME
             // =========================================================
             if (CurrentFrame != _lastSoundFrame && Animations.TryGetValue(_currentAnimationName, out var state))
             {
                 _lastSoundFrame = CurrentFrame;
 
-                // Если в настройках этой анимации к текущему кадру привязан звук
+                // If a sound is bound to the current frame in this animation's settings
                 if (state.SoundEvents.TryGetValue(CurrentFrame, out var soundKey))
                 {
-                    // Ищем AudioSource на этом же объекте и просим его сыграть
+                    // Find the AudioSource on the same object and ask it to play
                     var audioSource = Owner?.GetComponent<AudioSourceComponent>();
                     audioSource?.PlayOneShot(soundKey);
                 }
@@ -154,7 +154,7 @@ namespace ef2dg
                     else CurrentFrame = TotalFrames - 1;
                     
                     IsAnimationFinished = true;
-                    _lastSoundFrame = -1; // Сбрасываем трекер при зацикливании
+                    _lastSoundFrame = -1; // Reset the tracker when looping
                 }
                 _frameTimer = 0f;
             }

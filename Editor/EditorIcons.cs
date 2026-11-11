@@ -5,12 +5,12 @@ namespace ef2dg
 {
     public enum EditorIcon { ChevronUp, ChevronDown, Trash }
 
-    // Иконки-кнопки в стиле VS Code, нарисованные линиями: шрифт редактора не содержит значков
+    // VS Code-style icon buttons drawn with lines: the editor font has no icon glyphs
     public static class EditorIcons
     {
         private const float Stroke = 1.5f;
 
-        // dimmed — приглушённый цвет, пока строка не под курсором (как действия в дереве VS Code)
+        // dimmed — muted colour while the row is not hovered (like actions in the VS Code tree)
         public static bool Button(string id, EditorIcon icon, string tooltip, bool enabled = true, bool dimmed = false, bool danger = false)
         {
             float size = ImGui.GetTextLineHeight() + 2f;
@@ -41,13 +41,13 @@ namespace ef2dg
             return clicked;
         }
 
-        // Ширина ряда из count кнопок — чтобы выровнять их по правому краю
+        // Width of a row of count buttons, used to right-align them
         public static float RowWidth(int count) =>
             count * (ImGui.GetTextLineHeight() + 2f) + (count - 1) * ImGui.GetStyle().ItemSpacing.X * 0.5f;
 
         private static void DrawIcon(ImDrawListPtr drawList, EditorIcon icon, Vector2 center, float half, uint color)
         {
-            // Центр на середину пикселя, чтобы тонкие линии не размывались
+            // Centre on the middle of a pixel so thin lines are not blurred
             center = new Vector2(MathF.Floor(center.X) + 0.5f, MathF.Floor(center.Y) + 0.5f);
             float u = half * 0.62f;
 
@@ -64,10 +64,10 @@ namespace ef2dg
                     break;
 
                 case EditorIcon.Trash:
-                    // Крышка с ручкой
+                    // Lid with a handle
                     drawList.AddLine(center + new Vector2(-u, -u * 0.62f), center + new Vector2(u, -u * 0.62f), color, Stroke);
                     drawList.AddRect(center + new Vector2(-u * 0.32f, -u * 0.95f), center + new Vector2(u * 0.32f, -u * 0.62f), color, 0f, ImDrawFlags.None, Stroke);
-                    // Корпус-трапеция и две прорези
+                    // Trapezoid body and two slots
                     drawList.AddQuad(
                         center + new Vector2(-u * 0.72f, -u * 0.4f), center + new Vector2(u * 0.72f, -u * 0.4f),
                         center + new Vector2(u * 0.56f, u), center + new Vector2(-u * 0.56f, u), color, Stroke);

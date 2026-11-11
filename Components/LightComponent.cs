@@ -7,46 +7,46 @@ namespace ef2dg
     {
         public bool Enabled { get; set; } = true;
 
-        // Цвет света (например, желто-оранжевый для факела)
+        // Light colour (for example, yellow-orange for a torch)
         public Vector4D<float> Color { get; set; } = new Vector4D<float>(1.0f, 0.8f, 0.5f, 1.0f);
 
-        // Яркость. Значения больше 1 пересвечивают поверхность и включают bloom
+        // Brightness. Values above 1 overexpose the surface and trigger bloom
         public float Intensity { get; set; } = 1.0f;
 
-        // Радиус свечения в игровых координатах
+        // Glow radius in game coordinates
         public float Radius { get; set; } = 4.0f;
 
-        // Смещение источника от позиции объекта (например, пламя над факелом)
+        // Offset of the source from the object position (for example, a flame above a torch)
         public Vector2D<float> Offset { get; set; } = new Vector2D<float>(0f, 0f);
 
-        // Резкость спада к краю: < 1 — ровное пятно, > 1 — свет собран у центра
+        // Edge falloff sharpness: < 1 gives an even spot, > 1 concentrates light in the centre
         public float Falloff { get; set; } = 1.0f;
 
-        // Видимое ядро источника (сфера, пламя), рисуется поверх освещённой сцены
+        // Visible source core (orb, flame), drawn on top of the lit scene
         public float Glow { get; set; } = 0f;
-        // Размер ядра как доля радиуса
+        // Core size as a fraction of the radius
         public float GlowSize { get; set; } = 0.2f;
 
-        // Неровное мерцание огня
+        // Uneven fire flicker
         public float FlickerAmount { get; set; } = 0f;
         public float FlickerSpeed { get; set; } = 8f;
 
-        // Плавная пульсация магии и кристаллов
+        // Smooth pulsing of magic and crystals
         public float PulseAmount { get; set; } = 0f;
         public float PulseSpeed { get; set; } = 1f;
 
-        // Случайная фаза, чтобы соседние факелы мерцали не синхронно
+        // Random phase so neighbouring torches do not flicker in sync
         private readonly float _seed = Random.Shared.NextSingle() * 1000f;
 
         public Vector2D<float> WorldPosition => Position + Offset;
 
-        // Текущие параметры с учётом мерцания и пульсации
+        // Current parameters with flicker and pulsing applied
         public void Evaluate(float time, out float intensity, out float radius, out float glow)
         {
             float factor = 1f;
             if (FlickerAmount > 0f)
             {
-                // Сумма несоизмеримых синусоид даёт неповторяющееся «живое» мерцание
+                // A sum of incommensurable sines gives a non-repeating "living" flicker
                 float t = time * FlickerSpeed + _seed;
                 float noise = MathF.Sin(t) * 0.5f + MathF.Sin(t * 2.31f + 1.7f) * 0.3f + MathF.Sin(t * 5.13f + 4.2f) * 0.2f;
                 factor *= 1f + noise * FlickerAmount;
@@ -58,15 +58,15 @@ namespace ef2dg
             factor = MathF.Max(0f, factor);
 
             intensity = Intensity * factor;
-            // Радиус «дышит» слабее яркости, иначе граница света заметно прыгает
+            // The radius "breathes" less than the brightness, otherwise the light edge visibly jumps
             radius = Radius * (0.85f + 0.15f * factor);
             glow = Glow * factor;
         }
 
         public override void Draw(SpriteRenderer renderer, Camera camera)
         {
-            // Оставляем пустым! Свет рисуется не вместе со спрайтами,
-            // а отдельным проходом LightingRenderer
+            // Left empty! Light is not drawn together with sprites,
+            // but in a separate LightingRenderer pass
         }
     }
 }

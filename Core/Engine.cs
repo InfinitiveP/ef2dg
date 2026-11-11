@@ -29,7 +29,7 @@ namespace ef2dg
         private Framebuffer _sceneFramebuffer = null!;
         private Framebuffer _transitionSnapshot = null!;
         private LightingRenderer _lighting = null!;
-        // Время для мерцания света; идёт и в редакторе, чтобы анимацию было видно при настройке
+        // Time for light flicker; it also runs in the editor so the animation is visible while tuning
         private float _renderTime;
 
         private TransitionPhase _transitionPhase = TransitionPhase.None;
@@ -41,22 +41,22 @@ namespace ef2dg
         public bool IsTransitionActive => _transitionPhase != TransitionPhase.None;
 
         // =========================================================
-        // АРХИТЕКТУРА СТЕКА СЦЕН И КЭШИРОВАНИЯ РЕДАКТОРА
+        // SCENE STACK AND EDITOR CACHING ARCHITECTURE
         // =========================================================
         private Stack<Scene> _sceneStack = new Stack<Scene>();
         
-        // Персистентная ссылка, гарантирующая сохранение прогресса редактирования GameScene
+        // Persistent reference that keeps GameScene editing progress
         private HashSet<Scene> _initializedScenes = new HashSet<Scene>();
 
-        // Буферы отложенных команд для безопасного переключения в конце кадра
+        // Deferred command buffers for safe switching at the end of the frame
         private Scene? _pendingSwitchScene = null;
         private Scene? _pendingPushScene = null;
         private bool _pendingPopScene = false;
 
-        // Флаг для автоматического возврата в Play Mode после завершения смены сцены
+        // Flag for automatically returning to Play Mode after a scene change completes
         private bool _pendingResumePlayMode = false;
 
-        // Активная сцена для логики (всегда лежит на вершине стека)
+        // Active scene for logic (always on top of the stack)
         public Scene CurrentScene => _sceneStack.Count > 0 ? _sceneStack.Peek() : null!;
 
         private int _frames = 0;
@@ -88,10 +88,10 @@ namespace ef2dg
         public void ChangeScene(Scene newScene)
         {
             if (IsTransitionActive) return;
-            // Если смена инициирована во время игры, ставим флаг на автовозврат
+            // If the change was triggered during play, set the auto-return flag
             if (_editorUI.State.IsPlayMode) _pendingResumePlayMode = true;
             
-            // ЗАЩИТА: Выходим из режима игры для безопасного кэширования
+            // SAFETY: leave play mode for safe caching
             _editorUI.State.IsPlayMode = false;
             _pendingSwitchScene = newScene;
         }
@@ -327,11 +327,11 @@ namespace ef2dg
             _gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             // =========================================================
-            // ИНТЕГРАЦИЯ ИМПОРТА АССЕТОВ (DRAG-AND-DROP)
+            // ASSET IMPORT INTEGRATION (DRAG-AND-DROP)
             // =========================================================
             _window.FileDrop += (string[] droppedFiles) =>
             {
-                // Проверяем, какая папка сейчас открыта в UI редактора
+                // Check which folder is currently open in the editor UI
                 string targetFolder = _editorUI.State.CurrentAssetFolder;
                 if (!Directory.Exists(targetFolder)) return;
 
@@ -342,7 +342,7 @@ namespace ef2dg
                         string fileName = Path.GetFileName(originalPath);
                         string destinationPath = Path.Combine(targetFolder, fileName);
                         
-                        // Копируем файл с заменой, если он уже существует
+                        // Copy the file, overwriting it if it already exists
                         File.Copy(originalPath, destinationPath, true);
                         Console.WriteLine($"[AssetImport] Successfully imported: {fileName} -> {targetFolder}");
                     }
@@ -371,16 +371,16 @@ namespace ef2dg
             audioEngine.Init();
             AudioLocator.Provide(audioEngine);
 
-            // Инициализируем стартовый уровень как базовый кэш редактора
+            // Initialize the starting level as the editor's base cache
             var startScene = new GameScene();
             startScene.Load(_resources, _input);
             _sceneStack.Push(startScene);
-            // Запоминаем конкретный объект сцены как уже инициализированный
+            // Remember this scene object as already initialized
             _initializedScenes.Add(startScene);
 
             _initializedScenes.Add(startScene);
 
-            // Создаем контроллер ImGui и передаем делегат ConfigureIO четвертым параметром
+            // Create the ImGui controller and pass the ConfigureIO delegate as the fourth parameter
             _imGuiController = new ImGuiController(_gl, _window, _input, ImGuiConfigurator.ConfigureIO);
 
             _framebuffer = new Framebuffer(_gl, 800, 600);
@@ -390,7 +390,7 @@ namespace ef2dg
 
         private void OnUpdate(double deltaTime)
         {
-            // Escape движок не перехватывает: в Play Mode он свободен для биндов игры, выход — File → Exit
+            // The engine does not intercept Escape: in Play Mode it is free for game bindings; exit via File → Exit
             if (!_editorUI.IsPlayMode && _wasPlayMode)
             {
                 AudioLocator.Get().PauseAll();
@@ -407,7 +407,7 @@ namespace ef2dg
             _imGuiController.Update((float)deltaTime);
             _editorUI.UpdateRuntimePointer(_camera);
 
-            // Логика и физика обрабатываются ТОЛЬКО для активной сцены на вершине стека
+            // Logic and physics run ONLY for the active scene on top of the stack
             if (_editorUI.IsPlayMode && !IsTransitionActive)
             {
                 if (CurrentScene != null) 
@@ -430,7 +430,7 @@ namespace ef2dg
             }
             else if (!IsTransitionActive)
             {
-                // Не двигаем камеру, пока печатают текст или жмут Ctrl+S / Ctrl+Z
+                // Do not move the camera while text is being typed or Ctrl+S / Ctrl+Z is pressed
                 var io = ImGui.GetIO();
                 if (_input.Keyboards.Count > 0 && !io.WantTextInput && !io.KeyCtrl)
                 {
@@ -469,7 +469,7 @@ namespace ef2dg
             }
 
             // =========================================================
-            // БЕЗОПАСНАЯ ФАЗА УПРАВЛЕНИЯ СТЕКОМ (Конец кадра)
+            // SAFE STACK MANAGEMENT PHASE (end of frame)
             // =========================================================
             if (_pendingSwitchScene != null)
             {
@@ -590,10 +590,10 @@ namespace ef2dg
 
                 scene.DrawWorld(_renderer, _camera);
 
-                // Свет каждой сцены ложится на уже нарисованный мир, но не на гизмо и HUD
+                // Each scene's light falls on the already drawn world, but not on gizmos and the HUD
                 if (scene.Lighting.Enabled && (_editorUI.IsPlayMode || DebugSettings.PreviewLightingInEditor))
                 {
-                    // Завершаем геометрию scene framebuffer до смены render target/blend state.
+                    // Finish the scene framebuffer geometry before changing the render target/blend state.
                     _renderer.FlushAll();
                     _lighting.Apply(scene, _sceneFramebuffer, _camera, _renderTime);
                 }

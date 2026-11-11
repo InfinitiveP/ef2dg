@@ -24,7 +24,7 @@ namespace ef2dg
         {
             if (Sprite == null || Physics == null) return;
 
-            // Ищем игрока
+            // Find the player
             if (_targetPlayer == null && Owner.ParentScene != null)
             {
                 foreach (var entity in Owner.ParentScene.Entities)
@@ -41,11 +41,11 @@ namespace ef2dg
 
             if (_cooldownTimer > 0) _cooldownTimer -= deltaTime;
 
-            // Блокировка движения при атаке
+            // Block movement while attacking
             if (IsAttacking)
             {
-                // На будущее: здесь можно добавить проверку на кадр удара для бота!
-                // if (Sprite.CurrentFrame == Sprite.ActionTriggerFrame) { /* нанести урон игроку */ }
+                // For the future: a check for the bot's hit frame can be added here!
+                // if (Sprite.CurrentFrame == Sprite.ActionTriggerFrame) { /* deal damage to the player */ }
                 
                 Physics.Velocity = new Vector2D<float>(0, Physics.Velocity.Y);
                 return; 

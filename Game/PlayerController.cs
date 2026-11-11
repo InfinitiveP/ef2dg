@@ -10,13 +10,13 @@ namespace ef2dg
 
         public bool IsAttacking => Sprite != null && Sprite.CurrentAnimationName == "Attack";
 
-        private bool _hasDealtDamageThisAttack = false; // Защита от мульти-урона за один взмах
+        private bool _hasDealtDamageThisAttack = false; // Guard against multiple hits within one swing
 
         public override void Update(float deltaTime)
         {
             if (Sprite == null || Physics == null) return;
 
-            // 1. АТАКА
+            // 1. ATTACK
             if (IsAttacking)
             {
                 if (Sprite.CurrentFrame == Sprite.ActionTriggerFrame && !_hasDealtDamageThisAttack)
@@ -39,17 +39,17 @@ namespace ef2dg
                 return; 
             }
 
-            // 2. ДВИЖЕНИЕ
+            // 2. MOVEMENT
             float moveX = 0;
             float moveY = 0;
 
             if (InputManager.IsActionPressed("Left")) { moveX -= MoveSpeed; Sprite.FlipX = true; }
             if (InputManager.IsActionPressed("Right")) { moveX += MoveSpeed; Sprite.FlipX = false; }
 
-            // ЛОГИКА ЗАВИСИТ ОТ ГРАВИТАЦИИ!
+            // THE LOGIC DEPENDS ON GRAVITY!
             if (Physics.GravityScale > 0)
             {
-                // Режим ПЛАТФОРМЕРА (прыжок активен, Y управляется гравитацией)
+                // PLATFORMER mode (jumping enabled, Y driven by gravity)
                 if (InputManager.IsActionPressed("Jump") && Physics.IsGrounded)
                 {
                     Physics.Velocity = new Vector2D<float>(Physics.Velocity.X, JumpForce);
@@ -59,26 +59,26 @@ namespace ef2dg
             }
             else
             {
-                // Режим ВИД СВЕРХУ (гравитации нет, свободно ходим по Y)
+                // TOP-DOWN mode (no gravity, free movement along Y)
                 if (InputManager.IsActionPressed("Up")) { moveY += MoveSpeed; }
                 if (InputManager.IsActionPressed("Down")) { moveY -= MoveSpeed; }
                 
                 Physics.Velocity = new Vector2D<float>(moveX, moveY);
             }
 
-            // 3. ПЕРЕДАЕМ ДАННЫЕ В АНИМАТОР
-            // Если играем с видом сверху, скорость учитывает обе оси (выбираем максимальную для анимации)
+            // 3. PASS DATA TO THE ANIMATOR
+            // In top-down mode the speed considers both axes (take the larger one for the animation)
             float currentSpeed = Physics.GravityScale > 0 ? MathF.Abs(moveX) : MathF.Max(MathF.Abs(moveX), MathF.Abs(moveY));
             
             Sprite.SetFloat("Speed", currentSpeed);
             Sprite.SetBool("IsGrounded", Physics.IsGrounded);
 
-            // 4. ПЕРЕКЛЮЧЕНИЕ СТЕЙТОВ
+            // 4. STATE SWITCHING
             if (!IsAttacking)
             {
                 if (Physics.GravityScale > 0)
                 {
-                    // Анимации платформера
+                    // Platformer animations
                     if (!Physics.IsGrounded)
                         Sprite.Play(Physics.Velocity.Y > 0 ? "Jump" : "Fall");
                     else
@@ -86,14 +86,14 @@ namespace ef2dg
                 }
                 else
                 {
-                    // Анимации вида сверху (здесь нет прыжков и падений)
+                    // Top-down animations (no jumps or falls here)
                     Sprite.Play(currentSpeed > 0.1f ? "Run" : "Idle");
                 }
             }
         }
 
         // ==========================================
-        // ЛОГИКА УДАРА (Перенесена из Сцены в Контроллер!)
+        // HIT LOGIC (moved from the scene into the controller!)
         // ==========================================
         private void PerformAttack()
         {

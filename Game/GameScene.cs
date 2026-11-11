@@ -6,24 +6,24 @@ namespace ef2dg
 {
     public class GameScene : Scene
     {
-        // Открываем публичный доступ к сеттеру для корректной линковки сериализатором
+        // Public setter so the serializer can link it correctly
         public GameObject Player { get; set; } = null!;
 
-        // Флаг изоляции: блокирует процедурную генерацию при десериализации файла
+        // Isolation flag: blocks procedural generation when deserializing a file
         public bool IsLoadedFromFile { get; set; } = false;
 
         public override void Load(ResourceManager resources, IInputContext input)
         {
             if (input.Keyboards.Count > 0) InputManager.Init(input.Keyboards[0]);
 
-            // Если данные восстанавливаются из JSON, дефолтный игрок и чистая карта не создаются
+            // When data is restored from JSON, the default player and empty map are not created
             if (IsLoadedFromFile) return;
 
             Texture texGrass = resources.GetTexture("assets/Tilemap_color1.png");
             Map = new Tilemap(0.5f);
             float hitboxRatio = 64f / 192f;
             
-            // --- СТАНДАРТНЫЙ ИГРОК (Создается только для новой чистой сцены) ---
+            // --- DEFAULT PLAYER (created only for a new empty scene) ---
             Player = new GameObject() { Position = new Vector2D<float>(1.5f, 1.0f) };
             Player.AlwaysActive = true;
             Player.ParentScene = this;
@@ -52,7 +52,7 @@ namespace ef2dg
                 Map?.DrawDebug(renderer, camera, new Vector4D<float>(0.0f, 1.0f, 0.0f, 1.0f));
 
             // =========================================================
-            // ОТРИСОВКА КОЛЛАЙДЕРОВ И ЯКОРЕЙ (GIZMO) В РЕДАКТОРЕ
+            // DRAWING COLLIDERS AND ANCHORS (GIZMOS) IN THE EDITOR
             // =========================================================
             if (DebugSettings.IsEditorMode)
             {

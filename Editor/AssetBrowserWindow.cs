@@ -12,7 +12,7 @@ namespace ef2dg
 
         private const string RootFolder = "assets";
         
-        // Переменные для отслеживания предпросмотра
+        // Variables for tracking the preview
         private string? _selectedFilePath = null;
         private nint _previewTextureId = 0;
         private string? _loadedPreviewPath = null;
@@ -28,41 +28,41 @@ namespace ef2dg
                 Directory.CreateDirectory(RootFolder);
             }
 
-            // Если папка для импорта не выбрана, ставим корневую
+            // If no import folder is selected, use the root
             if (string.IsNullOrEmpty(state.CurrentAssetFolder) || !Directory.Exists(state.CurrentAssetFolder))
             {
                 state.CurrentAssetFolder = RootFolder;
             }
 
-            // Вычисляем высоту: оставляем нижние 120 пикселей под панель предпросмотра
+            // Compute the height: keep the bottom 120 pixels for the preview panel
             float footerHeight = 120;
             var contentSize = new Vector2(0, ImGui.GetContentRegionAvail().Y - footerHeight);
 
             // =========================================================
-            // ВЕРХНЯЯ ЧАСТЬ: ДЕРЕВО ИЕРАРХИИ (HIERARCHY TREE)
+            // TOP PART: HIERARCHY TREE
             // =========================================================
-            // Включаем красивые линии соединения узлов (как в VS Code)
+            // Enable nice node connection lines (as in VS Code)
             ImGui.PushStyleVar(ImGuiStyleVar.IndentSpacing, 16.0f);
             
             ImGui.BeginChild("##AssetTree", contentSize, ImGuiChildFlags.Border, ImGuiWindowFlags.HorizontalScrollbar);
             
-            // Выводим корневую папку как открытый по умолчанию узел
+            // Show the root folder as a node that is open by default
             ImGuiTreeNodeFlags rootFlags = ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth;
             if (state.CurrentAssetFolder == RootFolder) rootFlags |= ImGuiTreeNodeFlags.Selected;
 
-            ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1.0f, 0.8f, 0.2f, 1.0f)); // Желтоватый корень
+            ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1.0f, 0.8f, 0.2f, 1.0f)); // Yellowish root
             bool rootOpen = ImGui.TreeNodeEx($"[+] {RootFolder}", rootFlags);
             ImGui.PopStyleColor();
 
             if (ImGui.IsItemClicked())
             {
                 state.CurrentAssetFolder = RootFolder;
-                _selectedFilePath = null; // Сбрасываем фокус файла
+                _selectedFilePath = null; // Reset the file focus
             }
 
             if (rootOpen)
             {
-                // Запускаем рекурсивную отрисовку содержимого
+                // Start the recursive drawing of the contents
                 RenderDirectoryTree(RootFolder, ctx, state);
                 ImGui.TreePop();
             }
@@ -73,7 +73,7 @@ namespace ef2dg
             ImGui.Separator();
 
             // =========================================================
-            // НИЖНЯЯ ЧАСТЬ: ПАНЕЛЬ ПРЕДПРОСМОТРА (PREVIEW PANEL)
+            // BOTTOM PART: PREVIEW PANEL
             // =========================================================
             ImGui.BeginChild("##AssetPreview", new Vector2(0, 0), ImGuiChildFlags.None, ImGuiWindowFlags.NoScrollbar);
             
@@ -85,14 +85,14 @@ namespace ef2dg
                 string fileName = Path.GetFileName(_selectedFilePath);
                 string ext = Path.GetExtension(fileName).ToLower();
 
-                // Сокращаем длинные имена для вывода
+                // Shorten long names for display
                 string dispName = fileName.Length > 25 ? fileName.Substring(0, 22) + "..." : fileName;
                 ImGui.TextColored(new Vector4(1.0f, 1.0f, 1.0f, 1.0f), dispName);
 
-                // Отрисовка превью в зависимости от расширения
+                // Draw the preview depending on the extension
                 if (ext == ".png")
                 {
-                    // Кэшируем загрузку текстуры превью, чтобы не грузить диск каждый кадр
+                    // Cache the preview texture so the disk is not hit every frame
                     if (_loadedPreviewPath != _selectedFilePath)
                     {
                         var tex = ctx.Resources.GetTexture(_selectedFilePath);
@@ -102,7 +102,7 @@ namespace ef2dg
 
                     if (_previewTextureId != 0)
                     {
-                        // Рисуем миниатюру с сохранением соотношения сторон (макс высота 70px)
+                        // Draw a thumbnail keeping the aspect ratio (max height 70px)
                         var tex = ctx.Resources.GetTexture(_selectedFilePath);
                         if (tex != null)
                         {
@@ -110,7 +110,7 @@ namespace ef2dg
                             float pHeight = 70.0f;
                             float pWidth = pHeight * aspect;
                             
-                            // Центрируем картинку по вертикали
+                            // Centre the image vertically
                             ImGui.SetCursorPosX((ImGui.GetWindowWidth() - pWidth) * 0.5f);
                             ImGui.Image(_previewTextureId, new Vector2(pWidth, pHeight), new Vector2(0, 0), new Vector2(1, 1));
                         }
@@ -121,13 +121,13 @@ namespace ef2dg
                     ImGui.Spacing();
                     ImGui.SetCursorPosX((ImGui.GetWindowWidth() - 100) * 0.5f);
                     
-                    // Кнопка проигрывания звука
+                    // Sound playback button
                     if (ImGui.Button("Play", new Vector2(100, 30)))
                     {
                         try 
                         {
-                            // ИСПРАВЛЕНИЕ: Вызываем актуальный метод PlaySFX твоего движка,
-                            // передавая путь к файлу, нулевую позицию для UI-звука и полную громкость
+                            // Call the engine's PlaySFX method,
+                            // passing the file path, a zero position for UI sound and full volume
                             AudioLocator.Get().PlaySFX(_selectedFilePath, new Vector2D<float>(0, 0), 1.0f);
                         } 
                         catch (Exception ex) 
@@ -138,7 +138,7 @@ namespace ef2dg
 
                     ImGui.SameLine();
                     
-                    // Кнопка мгновенной остановки
+                    // Instant stop button
                     if (ImGui.Button("Stop", new Vector2(80, 30)))
                     {
                         try 
@@ -170,27 +170,27 @@ namespace ef2dg
         }
 
         // =========================================================
-        // РЕКУРСИВНЫЙ РЕНДЕР ДЕРЕВА ДИРЕКТОРИЙ
+        // RECURSIVE DIRECTORY TREE RENDERING
         // =========================================================
         private void RenderDirectoryTree(string currentPath, EditorContext ctx, EditorState state)
         {
             try
             {
-                // 1. Сначала выводим все подпапки
+                // 1. First list all subfolders
                 var dirs = Directory.GetDirectories(currentPath);
                 foreach (var dir in dirs)
                 {
                     string dirName = Path.GetFileName(dir);
                     
                     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth;
-                    // Подсвечиваем папку, если она выбрана как текущая для импорта
+                    // Highlight the folder if it is the current import target
                     if (state.CurrentAssetFolder == dir) flags |= ImGuiTreeNodeFlags.Selected;
 
-                    ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.4f, 0.7f, 1.0f, 1.0f)); // Голубой
+                    ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.4f, 0.7f, 1.0f, 1.0f)); // Light blue
                     bool isOpen = ImGui.TreeNodeEx($"[+] {dirName}##{dir}", flags);
                     ImGui.PopStyleColor();
 
-                    // Клик по папке делает её целевой для Drag-and-Drop
+                    // Clicking a folder makes it the drag-and-drop target
                     if (ImGui.IsItemClicked())
                     {
                         state.CurrentAssetFolder = dir;
@@ -204,37 +204,37 @@ namespace ef2dg
                     }
                 }
 
-                // 2. Затем выводим файлы в текущей папке
+                // 2. Then list the files in the current folder
                 var files = Directory.GetFiles(currentPath);
                 foreach (var file in files)
                 {
                     string fileName = Path.GetFileName(file);
                     string ext = Path.GetExtension(fileName).ToLower();
 
-                    // Определение цвета файла
+                    // File colour
                     Vector4 fileColor = new Vector4(0.8f, 0.8f, 0.8f, 1.0f);
-                    if (ext == ".png") fileColor = new Vector4(0.5f, 1.0f, 0.5f, 1.0f); // Зеленый
-                    else if (ext == ".json") fileColor = new Vector4(1.0f, 0.6f, 0.2f, 1.0f); // Оранжевый
-                    else if (ext == ".wav" || ext == ".mp3") fileColor = new Vector4(1.0f, 0.4f, 0.8f, 1.0f); // Розовый
+                    if (ext == ".png") fileColor = new Vector4(0.5f, 1.0f, 0.5f, 1.0f); // Green
+                    else if (ext == ".json") fileColor = new Vector4(1.0f, 0.6f, 0.2f, 1.0f); // Orange
+                    else if (ext == ".wav" || ext == ".mp3") fileColor = new Vector4(1.0f, 0.4f, 0.8f, 1.0f); // Pink
 
                     ImGui.PushStyleColor(ImGuiCol.Text, fileColor);
                     
-                    // Рисуем узел-лист (Leaf) без стрелочки
+                    // Draw a leaf node without an arrow
                     ImGuiTreeNodeFlags leafFlags = ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen | ImGuiTreeNodeFlags.SpanAvailWidth;
                     if (_selectedFilePath == file) leafFlags |= ImGuiTreeNodeFlags.Selected;
 
                     ImGui.TreeNodeEx($"{fileName}##{file}", leafFlags);
                     ImGui.PopStyleColor();
 
-                    // Одинарный клик: выбираем файл для панели предпросмотра
+                    // Single click: select the file for the preview panel
                     if (ImGui.IsItemClicked())
                     {
                         _selectedFilePath = file;
-                        // Автоматически выделяем родительскую папку для удобства импорта
+                        // Automatically select the parent folder for convenient import
                         state.CurrentAssetFolder = currentPath; 
                     }
 
-                    // Двойной клик по спрайту: активация кисти тайлов
+                    // Double click on a sprite: activate the tile brush
                     if (ext == ".png" && ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                     {
                         state.SelectedTilePath = file.Replace('\\', '/');

@@ -60,7 +60,7 @@ First steps in the editor:
 1. `File → New Scene` or `File → Open...` (`Ctrl+O`).
 2. `Ctrl+Shift+N` creates an object; press **Add Component** in the **Inspector**.
 3. Pick a tile in **Tile Palette** and paint in the **Scene View**.
-4. In the **Lighting** window choose a preset and press **+ Добавить источник света** (add light source).
+4. In the **Lighting** window choose a preset and press **+ Add light source**.
 5. `Ctrl+S` saves, `Ctrl+P` toggles Play / Stop.
 
 > [!WARNING]
@@ -178,7 +178,6 @@ The full wiki is available in English in [`obsidian/ef2dg_Docs_en`](obsidian/ef2
 - A `BoxCollider` without `IsTrigger` does not stop a `PhysicsBody`: solid obstacles come from the tilemap.
 - No shadows: light passes through walls.
 - References between objects and private component state are not saved to JSON.
-- Source code comments and some Lighting window labels are still in Russian.
 
 ## Dependencies
 

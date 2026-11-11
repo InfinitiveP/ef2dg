@@ -34,8 +34,8 @@ namespace ef2dg
                 ImGui.Separator();
                 ImGui.Spacing();
 
-                // Освещение больше не глобальное: у каждой сцены свои настройки
-                ImGui.TextDisabled("2D Lighting настраивается для каждой сцены в окне Lighting.");
+                // Lighting is no longer global: every scene has its own settings
+                ImGui.TextDisabled("2D Lighting is configured per scene in the Lighting window.");
 
                 if (needsSave) ProjectConfig.Save();
             }

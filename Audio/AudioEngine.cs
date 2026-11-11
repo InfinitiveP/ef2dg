@@ -64,15 +64,15 @@ namespace ef2dg
             }
             catch (Exception ex)
             {
-                // Теперь ошибка отсутствия DLL будет видна максимально четко
+                // A missing DLL error is now shown as clearly as possible
                 Console.WriteLine($"[AudioEngine] CRITICAL OpenAL Native Init Error: {ex.Message}");
-                _al = null!; // Гарантируем, что переменная сброшена
+                _al = null!; // Make sure the variable is reset
             }
         }
 
         private uint GetOrLoadBuffer(string path)
         {
-            // БЕЗОПАСНОСТЬ: Если OpenAL не инициализировался, отсекаем загрузку сразу
+            // SAFETY: if OpenAL did not initialize, stop loading right away
             if (_al == null)
             {
                 Console.WriteLine($"[AudioEngine] SKIP: Cannot load '{path}', OpenAL core is offline.");
@@ -143,7 +143,7 @@ namespace ef2dg
                         }
                     }
 
-                    // Если чанк data оказался пустым или битым
+                    // If the data chunk turned out to be empty or corrupted
                     if (data.Length == 0)
                     {
                         Console.WriteLine($"[AudioEngine] ERROR: No audio data found inside WAV: {path}");
@@ -203,9 +203,9 @@ namespace ef2dg
         {
             if (_al == null) return;
 
-            // Аппаратно останавливаем выделенный музыкальный канал
+            // Stop the dedicated music channel in hardware
             _al.SourceStop(_musicSource);
-            _currentMusicPath = ""; // Сбрасываем путь, чтобы трек можно было запустить повторно
+            _currentMusicPath = ""; // Reset the path so the track can be started again
             
             Console.WriteLine("[AudioEngine] Stopped OpenAL Music.");
         }
@@ -214,10 +214,10 @@ namespace ef2dg
         {
             if (_al == null) return;
 
-            // 1. Останавливаем фоновую музыку
+            // 1. Stop the background music
             StopMusic();
 
-            // 2. Используем .Count для перебора списка List<uint>
+            // 2. Use .Count to iterate over the List<uint>
             for (int i = 0; i < _sourcesPool.Count; i++)
             {
                 _al.SourceStop(_sourcesPool[i]);
@@ -230,14 +230,14 @@ namespace ef2dg
         {
             if (_al == null) return;
 
-            // 1. Паузим музыку, если она играла прямо сейчас
+            // 1. Pause the music if it is playing right now
             _al.GetSourceProperty(_musicSource, GetSourceInteger.SourceState, out int mState);
             if ((SourceState)mState == SourceState.Playing)
             {
                 _al.SourcePause(_musicSource);
             }
 
-            // 2. Паузим все 16 каналов SFX (летящие фаерболы, крики, шаги)
+            // 2. Pause all 16 SFX channels (flying fireballs, screams, footsteps)
             foreach (uint source in _sourcesPool)
             {
                 _al.GetSourceProperty(source, GetSourceInteger.SourceState, out int sState);
@@ -254,14 +254,14 @@ namespace ef2dg
         {
             if (_al == null) return;
 
-            // 1. Продолжаем музыку с той же миллисекунды
+            // 1. Resume the music from the same millisecond
             _al.GetSourceProperty(_musicSource, GetSourceInteger.SourceState, out int mState);
             if ((SourceState)mState == SourceState.Paused)
             {
                 _al.SourcePlay(_musicSource);
             }
 
-            // 2. Продолжаем все недоигранные SFX эффекты
+            // 2. Resume every unfinished SFX
             foreach (uint source in _sourcesPool)
             {
                 _al.GetSourceProperty(source, GetSourceInteger.SourceState, out int sState);
@@ -337,13 +337,13 @@ namespace ef2dg
                 _al.DeleteSource(source);
             }
 
-            // Удаляем буферы из памяти
+            // Delete the buffers from memory
             foreach (uint buffer in _audioBuffers.Values)
             {
                 _al.DeleteBuffer(buffer);
             }
 
-            // Уничтожаем контекст
+            // Destroy the context
             if (_context != null)
             {
                 _alc.MakeContextCurrent(null);

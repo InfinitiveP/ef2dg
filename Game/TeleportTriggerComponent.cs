@@ -11,8 +11,8 @@ namespace ef2dg
 
         public override void OnTriggerEnter(GameObject other)
         {
-            // Проверяем, кто именно наступил. 
-            // Пока нет системы тегов, просто ищем контроллер игрока, чтобы мобы не телепортировались
+            // Check who exactly stepped in.
+            // There is no tag system yet, so look for the player controller to keep mobs from teleporting
             var player = other.GetComponent<PlayerController>();
             
             if (player != null)

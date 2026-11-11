@@ -27,7 +27,7 @@ namespace ef2dg
                 return;
             }
 
-            // ПЕРЕИМЕНОВАНИЕ ОБЪЕКТА
+            // OBJECT RENAMING
             string objName = state.SelectedEntity.Name;
             if (ImGui.InputText("##ObjectName", ref objName, 64))
             {
@@ -67,11 +67,11 @@ namespace ef2dg
                     else
                         DrawComponentProperties(component);
 
-                    // Если это Спрайт, рисуем его кастомные поля
+                    // For a sprite, draw its custom fields
                     if (component is SpriteComponent sprite)
                     {
                         // ==========================================
-                            // ПАНЕЛЬ ПАРАМЕТРОВ (Теперь только для ЧТЕНИЯ / ТЕСТА)
+                            // PARAMETERS PANEL (now READ-ONLY / TEST)
                             // ==========================================
                             ImGui.Separator();
                             ImGui.TextColored(new System.Numerics.Vector4(0.4f, 0.8f, 0.8f, 1.0f), "Animator Parameters (Auto-detected)");
@@ -91,12 +91,12 @@ namespace ef2dg
                                 {
                                     ImGui.Text($"{p.Name}: Trigger");
                                     ImGui.SameLine(ImGui.GetWindowWidth() - 70);
-                                    if (ImGui.Button($"Test##{p.Name}")) p.TriggerValue = true; // Оставили только кнопку теста!
+                                    if (ImGui.Button($"Test##{p.Name}")) p.TriggerValue = true; // Only the test button is left!
                                 }
                             }
 
                             // ==========================================
-                            // БЛОК СОСТОЯНИЙ (Остался без изменений)
+                            // STATES BLOCK (unchanged)
                             // ==========================================
                             ImGui.Separator();
                             ImGui.TextColored(new Vector4(0.4f, 0.8f, 0.4f, 1.0f), "Animation States");
@@ -110,7 +110,7 @@ namespace ef2dg
                                     string texPath = animState.TexturePath;
                                     if (ImGui.BeginCombo($"Texture##{stateName}", texPath))
                                     {
-                                        // ИСПРАВЛЕНИЕ: Локальная переменная для ref
+                                        // Local variable for ref
                                         string filter = state.TextureSearchFilter;
                                         if (ImGui.InputText("Search", ref filter, 100)) state.TextureSearchFilter = filter;
                                         
@@ -158,7 +158,7 @@ namespace ef2dg
                                     }
                                     if (frameToRemove != -1) animState.SoundEvents.Remove(frameToRemove);
 
-                                    // Блок добавления нового триггера
+                                    // Block for adding a new trigger
                                     int targetFrame = state.NewAudioFrame;
                                     ImGui.SetNextItemWidth(50);
                                     if (ImGui.InputInt("Frame##SE", ref targetFrame, 0)) state.NewAudioFrame = targetFrame;
@@ -171,12 +171,12 @@ namespace ef2dg
                                     ImGui.SameLine();
                                     if (ImGui.Button("+ Link Sound") && !string.IsNullOrWhiteSpace(state.NewAudioSfxKey))
                                     {
-                                        // Привязываем введенный ключ (например, "Hit") к нужному кадру
+                                        // Bind the entered key (for example, "Hit") to the right frame
                                         animState.SoundEvents[state.NewAudioFrame] = state.NewAudioSfxKey;
                                     }
                                     ImGui.Separator();
 
-                                    // Интерфейс для настройки Переходов
+                                    // Transition setup UI
                                     ImGui.Spacing();
                                     ImGui.TextColored(new Vector4(0.8f, 0.8f, 0.4f, 1.0f), "Transitions:");
                                     
@@ -223,7 +223,7 @@ namespace ef2dg
 
                             ImGui.Spacing();
                             
-                            // ИСПРАВЛЕНИЕ: Локальная переменная для ref
+                            // Local variable for ref
                             string newState = state.NewStateName;
                             if (ImGui.InputText("##NewState", ref newState, 64)) state.NewStateName = newState;
                             
@@ -238,14 +238,14 @@ namespace ef2dg
                             }
                     }
                     // =========================================================
-                    // КАСТОМНЫЙ ИНТЕРФЕЙС ДЛЯ AUDIO SOURCE COMPONENT
+                    // CUSTOM UI FOR AUDIO SOURCE COMPONENT
                     // =========================================================
                     if (component is AudioSourceComponent audio)
                     {
                         ImGui.Separator();
                         ImGui.TextColored(new Vector4(1.0f, 0.6f, 0.2f, 1.0f), "Audio File Selectors");
 
-                        // 1. ВЫПАДАЛКА ДЛЯ ФОНОВОЙ МУЗЫКИ (DefaultSoundPath)
+                        // 1. DROP-DOWN FOR BACKGROUND MUSIC (DefaultSoundPath)
                         ImGui.Text("Background / Default Track:");
                         string currentPath = audio.DefaultSoundPath;
                         if (ImGui.BeginCombo("##AudioDefaultCombo", string.IsNullOrEmpty(currentPath) ? "None" : currentPath))
@@ -255,7 +255,7 @@ namespace ef2dg
 
                             if (System.IO.Directory.Exists("assets"))
                             {
-                                // Ищем все аудиофайлы (wav, ogg, mp3)
+                                // Find every audio file (wav, ogg, mp3)
                                 var files = System.IO.Directory.GetFiles("assets", "*.*", System.IO.SearchOption.AllDirectories)
                                     .Where(f => f.EndsWith(".wav", StringComparison.OrdinalIgnoreCase) || 
                                                 f.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase) || 
@@ -276,7 +276,7 @@ namespace ef2dg
                             ImGui.EndCombo();
                         }
 
-                        // Кнопка теста для фонового трека
+                        // Test button for the background track
                         ImGui.SameLine();
                         if (ImGui.Button("Play##TestBg") && !string.IsNullOrEmpty(audio.DefaultSoundPath))
                         {
@@ -288,10 +288,10 @@ namespace ef2dg
                         if (ImGui.Button("Stop##TestBg"))
                         {
                             AudioLocator.Get().StopMusic();
-                            audio.ResetPlayState(); // Сбрасываем флаг компонента
+                            audio.ResetPlayState(); // Reset the component flag
                         }
 
-                        // 2. СЛОВАРЬ ЗВУКОВЫХ ЭФФЕКТОВ (SFX)
+                        // 2. SOUND EFFECTS (SFX) DICTIONARY
                         ImGui.Spacing();
                         ImGui.TextColored(new Vector4(0.8f, 0.8f, 0.2f, 1.0f), "Sound Effects Dictionary (SFX):");
 
@@ -307,7 +307,7 @@ namespace ef2dg
                             string clipPath = audio.SoundClips[key];
                             ImGui.SetNextItemWidth(150);
                             
-                            // Индивидуальная выпадалка для каждого SFX
+                            // Individual drop-down for each SFX
                             if (ImGui.BeginCombo("##SfxCombo", string.IsNullOrEmpty(clipPath) ? "None" : clipPath))
                             {
                                 string filter = state.AudioSearchFilter;
@@ -335,7 +335,7 @@ namespace ef2dg
                             }
 
                             ImGui.SameLine();
-                            if (ImGui.Button("▶")) audio.PlayOneShot(key); // Быстрый тест SFX
+                            if (ImGui.Button("▶")) audio.PlayOneShot(key); // Quick SFX test
 
                             ImGui.SameLine();
                             if (ImGui.Button("X")) sfxToRemove = key;
@@ -345,7 +345,7 @@ namespace ef2dg
 
                         if (sfxToRemove != null) audio.SoundClips.Remove(sfxToRemove);
 
-                        // ДОБАВЛЕНИЕ НОВОГО КЛЮЧА SFX (Например: "Hit", "Jump")
+                        // ADDING A NEW SFX KEY (for example: "Hit", "Jump")
                         ImGui.Spacing();
                         string newKey = state.NewAudioKey;
                         ImGui.SetNextItemWidth(120);
@@ -391,7 +391,7 @@ namespace ef2dg
         {
             Type compType = component.GetType();
 
-            // Кешуємо PropertyInfo[], щоб не викликати Reflection щокадру
+            // Cache PropertyInfo[] so reflection is not called every frame
             if (!_propertyCache.TryGetValue(compType, out var properties))
             {
                 properties = compType.GetProperties(BindingFlags.Public | BindingFlags.Instance);

@@ -9,14 +9,14 @@ uniform float uThreshold;
 
 void main()
 {
-    // 4 билинейные выборки усредняют блок 4x4, чтобы мелкие блики не мерцали при уменьшении
+    // 4 bilinear samples average a 4x4 block so small highlights do not flicker when downscaled
     vec3 color = texture(uTexture, vUv + uTexelSize * vec2(-1.0, -1.0)).rgb
                + texture(uTexture, vUv + uTexelSize * vec2( 1.0, -1.0)).rgb
                + texture(uTexture, vUv + uTexelSize * vec2(-1.0,  1.0)).rgb
                + texture(uTexture, vUv + uTexelSize * vec2( 1.0,  1.0)).rgb;
     color *= 0.25;
 
-    // Мягкое колено: пиксели чуть ниже порога светятся слабо, без резкой границы
+    // Soft knee: pixels slightly below the threshold glow faintly, without a hard edge
     float brightness = max(color.r, max(color.g, color.b));
     float knee = max(uThreshold * 0.5, 0.0001);
     float soft = clamp(brightness - uThreshold + knee, 0.0, 2.0 * knee);

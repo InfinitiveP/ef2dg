@@ -4,7 +4,7 @@ using Silk.NET.Maths;
 
 namespace ef2dg
 {
-    // Действия редактора, общие для главного меню, Toolbar и горячих клавиш
+    // Editor actions shared by the main menu, the Toolbar and hotkeys
     public static class EditorCommands
     {
         public static void TogglePlayMode(EditorContext ctx, EditorState state)
@@ -12,15 +12,15 @@ namespace ef2dg
             if (state.IsPlayMode)
             {
                 state.IsPlayMode = false;
-                // Возвращаем зум, с которым мы работали в редакторе
+                // Restore the zoom we used in the editor
                 ctx.GameCamera.Zoom = state.EditorCameraZoom;
             }
             else
             {
                 state.IsPlayMode = true;
-                // Запоминаем текущий зум редактора
+                // Remember the current editor zoom
                 state.EditorCameraZoom = ctx.GameCamera.Zoom;
-                // Применяем игровой зум из настроек проекта
+                // Apply the game zoom from the project settings
                 ctx.GameCamera.Zoom = ProjectConfig.Data.DefaultCameraZoom;
             }
         }
@@ -28,7 +28,7 @@ namespace ef2dg
         public static void NewScene(EditorContext ctx, EditorState state, Type sceneType)
         {
             var newScene = (Scene)Activator.CreateInstance(sceneType)!;
-            // Блокируем генерацию дефолтного игрока для новых сцен
+            // Block generation of the default player for new scenes
             if (newScene is GameScene gs) gs.IsLoadedFromFile = true;
             newScene.InstanceName = newScene.GetType().Name;
             state.OpenedScenes.Add(newScene);

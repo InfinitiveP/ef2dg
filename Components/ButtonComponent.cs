@@ -18,8 +18,8 @@ namespace ef2dg
         {
             if (Sprite != null)
             {
-                // Передаем состояние как Float (1.0f или 0.0f), 
-                // чтобы использовать числовое поле ввода Threshold в Inspector
+                // Pass the state as a float (1.0f or 0.0f)
+                // so the numeric Threshold field in the Inspector can be used
                 Sprite.SetFloat("IsHovered", IsHovered ? 1.0f : 0.0f);
             }
         }

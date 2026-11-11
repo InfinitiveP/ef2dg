@@ -12,7 +12,7 @@ namespace ef2dg
 
         public override void Start()
         {
-            // Пытаемся зарегистрировать параметр при старте (если спрайт уже добавлен)
+            // Try to register the parameter at start (if the sprite is already added)
             var sprite = Owner.GetComponent<SpriteComponent>();
             if (sprite != null) sprite.SetFloat("Speed", 0f);
         }
@@ -22,7 +22,7 @@ namespace ef2dg
             var sprite = Owner.GetComponent<SpriteComponent>();
             var pb = Owner.GetComponent<PhysicsBody>();
 
-            // 1. ЛЕНИВЫЙ ПОИСК ИГРОКА: Если его еще нет, ищем его каждый кадр
+            // 1. LAZY PLAYER LOOKUP: if there is no player yet, search every frame
             if (_targetPlayer == null && Owner.ParentScene != null)
             {
                 foreach (var entity in Owner.ParentScene.Entities)
@@ -35,8 +35,8 @@ namespace ef2dg
                 }
             }
 
-            // 2. ЗАЩИТА: Если игрока все еще нет на сцене, мы стоим на месте, 
-            // но обязательно отправляем параметр 0 в Аниматор, чтобы он появился в UI!
+            // 2. GUARD: if the player is still not in the scene, stay in place,
+            // but always send parameter 0 to the animator so it shows up in the UI!
             if (_targetPlayer == null)
             {
                 if (pb != null) pb.Velocity = new Silk.NET.Maths.Vector2D<float>(0, pb.Velocity.Y);
@@ -44,7 +44,7 @@ namespace ef2dg
                 return;
             }
 
-            // 3. ОСНОВНАЯ ЛОГИКА ДВИЖЕНИЯ
+            // 3. MAIN MOVEMENT LOGIC
             float dx = _targetPlayer.Position.X - Owner.Position.X;
             float distance = MathF.Abs(dx);
 

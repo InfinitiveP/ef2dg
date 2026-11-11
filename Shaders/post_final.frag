@@ -26,7 +26,7 @@ void main()
     color = mix(vec3(luminance), color, uSaturation);
     color = (color - 0.5) * uContrast + 0.5;
 
-    // Виньетка: 0 в центре кадра, 1 в углах (с учётом пропорций вьюпорта)
+    // Vignette: 0 at the frame centre, 1 in the corners (taking the viewport aspect into account)
     vec2 centered = (vUv - 0.5) * vec2(uAspect, 1.0);
     float radius = length(centered) / length(vec2(0.5 * uAspect, 0.5));
     float vignette = smoothstep(uVignetteSize, uVignetteSize + 0.6, radius) * uVignetteStrength;

@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace ef2dg
 {
-    // Окно настройки освещения текущей сцены: пресеты локаций, темнота, bloom, цветокоррекция и список источников.
+    // Lighting settings window for the current scene: location presets, darkness, bloom, colour grading and the source list.
     public class LightingWindow : EditorWindow
     {
         public override string Title => "Lighting";
@@ -17,7 +17,7 @@ namespace ef2dg
         private static readonly JsonSerializerOptions PresetJsonOptions = new JsonSerializerOptions { WriteIndented = true, IncludeFields = true };
 
         private List<ScenePreset>? _customPresets;
-        private string _newPresetName = "Моя локация";
+        private string _newPresetName = "My location";
 
         public override void Draw(EditorContext ctx, EditorState state)
         {
@@ -29,69 +29,69 @@ namespace ef2dg
             var lighting = scene.Lighting;
             string sceneName = string.IsNullOrEmpty(scene.InstanceName) ? scene.GetType().Name : scene.InstanceName;
 
-            ImGui.TextColored(new Vector4(1.0f, 0.8f, 0.2f, 1.0f), $"Сцена: {sceneName}");
-            ImGui.TextDisabled("Сохраняется вместе с уровнем (File > Save, Ctrl+S)");
+            ImGui.TextColored(new Vector4(1.0f, 0.8f, 0.2f, 1.0f), $"Scene: {sceneName}");
+            ImGui.TextDisabled("Saved together with the level (File > Save, Ctrl+S)");
             ImGui.Spacing();
 
             bool enabled = lighting.Enabled;
-            if (ImGui.Checkbox("Включить освещение", ref enabled)) lighting.Enabled = enabled;
-            Tip("Освещение и пост-эффекты только для этой сцены.\nУ каждой локации свои настройки.");
+            if (ImGui.Checkbox("Enable lighting", ref enabled)) lighting.Enabled = enabled;
+            Tip("Lighting and post-effects for this scene only.\nEvery location has its own settings.");
 
             ImGui.SameLine();
             bool preview = DebugSettings.PreviewLightingInEditor;
-            if (ImGui.Checkbox("В редакторе", ref preview)) DebugSettings.PreviewLightingInEditor = preview;
-            Tip("Показывать освещение вне Play Mode.\nВыключите, если в темноте неудобно расставлять объекты.");
+            if (ImGui.Checkbox("In editor", ref preview)) DebugSettings.PreviewLightingInEditor = preview;
+            Tip("Show lighting outside Play Mode.\nTurn it off if placing objects in the dark is inconvenient.");
 
             DrawPresets(scene);
 
             if (!lighting.Enabled)
             {
-                ImGui.TextColored(new Vector4(1.0f, 0.5f, 0.3f, 1.0f), "Освещение выключено: включите его или выберите пресет.");
+                ImGui.TextColored(new Vector4(1.0f, 0.5f, 0.3f, 1.0f), "Lighting is off: enable it or pick a preset.");
             }
 
             ImGui.Spacing();
-            if (ImGui.CollapsingHeader("Темнота (общий свет)", ImGuiTreeNodeFlags.DefaultOpen))
+            if (ImGui.CollapsingHeader("Darkness (ambient light)", ImGuiTreeNodeFlags.DefaultOpen))
             {
-                lighting.AmbientColor = Color3("Цвет##ambient", lighting.AmbientColor,
-                    "Каким цветом видна сцена там, куда не достаёт ни один источник.\nТёмно-фиолетовый — бездна, тёмно-синий — ночь, белый — без затемнения.");
-                lighting.AmbientIntensity = Slider("Яркость##ambient", lighting.AmbientIntensity, 0f, 2f,
-                    "Множитель цвета темноты. 0 — полная тьма, 1 — как выбрано в цвете.");
+                lighting.AmbientColor = Color3("Color##ambient", lighting.AmbientColor,
+                    "The scene colour where no light source reaches.\nDark purple — abyss, dark blue — night, white — no darkening.");
+                lighting.AmbientIntensity = Slider("Brightness##ambient", lighting.AmbientIntensity, 0f, 2f,
+                    "Darkness colour multiplier. 0 — total darkness, 1 — exactly the chosen colour.");
             }
 
-            if (ImGui.CollapsingHeader("Источники света", ImGuiTreeNodeFlags.DefaultOpen))
+            if (ImGui.CollapsingHeader("Light sources", ImGuiTreeNodeFlags.DefaultOpen))
             {
-                lighting.LightMultiplier = Slider("Яркость всех", lighting.LightMultiplier, 0f, 3f,
-                    "Общий множитель для всех LightComponent этой сцены.");
+                lighting.LightMultiplier = Slider("Overall brightness", lighting.LightMultiplier, 0f, 3f,
+                    "Global multiplier for every LightComponent in this scene.");
                 DrawLightList(ctx, state);
             }
 
-            if (ImGui.CollapsingHeader("Свечение (Bloom)", ImGuiTreeNodeFlags.DefaultOpen))
+            if (ImGui.CollapsingHeader("Glow (Bloom)", ImGuiTreeNodeFlags.DefaultOpen))
             {
-                lighting.BloomStrength = Slider("Сила##bloom", lighting.BloomStrength, 0f, 3f,
-                    "Мягкий ореол вокруг ярких мест: сфер, огня, пересвеченного пола. 0 — выключено.");
-                lighting.BloomThreshold = Slider("Порог##bloom", lighting.BloomThreshold, 0f, 2f,
-                    "С какой яркости пиксель начинает светиться. Меньше — светится больше деталей.");
-                lighting.BloomRadius = Slider("Размытие##bloom", lighting.BloomRadius, 0.5f, 4f,
-                    "Ширина ореола.");
+                lighting.BloomStrength = Slider("Strength##bloom", lighting.BloomStrength, 0f, 3f,
+                    "A soft halo around bright spots: orbs, fire, an overexposed floor. 0 — off.");
+                lighting.BloomThreshold = Slider("Threshold##bloom", lighting.BloomThreshold, 0f, 2f,
+                    "Brightness at which a pixel starts to glow. Lower — more details glow.");
+                lighting.BloomRadius = Slider("Blur##bloom", lighting.BloomRadius, 0.5f, 4f,
+                    "Halo width.");
             }
 
-            if (ImGui.CollapsingHeader("Цветокоррекция"))
+            if (ImGui.CollapsingHeader("Color grading"))
             {
-                lighting.Exposure = Slider("Экспозиция", lighting.Exposure, 0.2f, 3f, "Общая яркость кадра.");
-                lighting.Contrast = Slider("Контраст", lighting.Contrast, 0.5f, 2f, "1 — без изменений.");
-                lighting.Saturation = Slider("Насыщенность", lighting.Saturation, 0f, 2f, "0 — чёрно-белое изображение, 1 — без изменений.");
-                lighting.Tint = Color3("Оттенок", lighting.Tint, "Цветовой фильтр поверх всего кадра. Белый — без изменений.");
+                lighting.Exposure = Slider("Exposure", lighting.Exposure, 0.2f, 3f, "Overall frame brightness.");
+                lighting.Contrast = Slider("Contrast", lighting.Contrast, 0.5f, 2f, "1 — unchanged.");
+                lighting.Saturation = Slider("Saturation", lighting.Saturation, 0f, 2f, "0 — black and white, 1 — unchanged.");
+                lighting.Tint = Color3("Tint", lighting.Tint, "Colour filter over the whole frame. White — unchanged.");
             }
 
-            if (ImGui.CollapsingHeader("Виньетка"))
+            if (ImGui.CollapsingHeader("Vignette"))
             {
-                lighting.VignetteStrength = Slider("Сила##vignette", lighting.VignetteStrength, 0f, 1f, "Затемнение краёв кадра. 0 — выключено.");
-                lighting.VignetteSize = Slider("Размер##vignette", lighting.VignetteSize, 0f, 1f, "Где начинается затемнение: меньше — ближе к центру.");
-                lighting.VignetteColor = Color3("Цвет##vignette", lighting.VignetteColor, "Цвет краёв. Тёмно-фиолетовый усиливает атмосферу бездны.");
+                lighting.VignetteStrength = Slider("Strength##vignette", lighting.VignetteStrength, 0f, 1f, "Darkening of the frame edges. 0 — off.");
+                lighting.VignetteSize = Slider("Size##vignette", lighting.VignetteSize, 0f, 1f, "Where the darkening starts: smaller — closer to the centre.");
+                lighting.VignetteColor = Color3("Color##vignette", lighting.VignetteColor, "Edge colour. Dark purple deepens the abyss atmosphere.");
             }
 
             ImGui.Spacing();
-            if (ImGui.Button("Сбросить настройки сцены", new Vector2(-1, 0)))
+            if (ImGui.Button("Reset scene settings", new Vector2(-1, 0)))
             {
                 scene.Lighting = new SceneLighting { Enabled = lighting.Enabled };
             }
@@ -102,9 +102,9 @@ namespace ef2dg
         private void DrawPresets(Scene scene)
         {
             ImGui.SetNextItemWidth(-1);
-            if (ImGui.BeginCombo("##ScenePreset", "Применить пресет локации..."))
+            if (ImGui.BeginCombo("##ScenePreset", "Apply a location preset..."))
             {
-                ImGui.TextDisabled("Встроенные");
+                ImGui.TextDisabled("Built-in");
                 foreach (var preset in LightingPresets.Scenes)
                 {
                     if (ImGui.Selectable(preset.Name)) scene.Lighting = preset.Settings.Clone();
@@ -114,7 +114,7 @@ namespace ef2dg
                 if (custom.Count > 0)
                 {
                     ImGui.Separator();
-                    ImGui.TextDisabled("Сохранённые");
+                    ImGui.TextDisabled("Saved");
                     foreach (var preset in custom)
                     {
                         if (ImGui.Selectable($"{preset.Name}##custom")) scene.Lighting = preset.Settings.Clone();
@@ -122,11 +122,11 @@ namespace ef2dg
                 }
                 ImGui.EndCombo();
             }
-            Tip("Готовый набор настроек для типа локации. Потом его можно подправить ниже.\nПКМ — удалить сохранённый пресет.");
+            Tip("A ready set of settings for a location type. You can fine-tune it below afterwards.\nRight-click — delete a saved preset.");
 
             if (ImGui.BeginPopupContextItem("PresetContext"))
             {
-                ImGui.TextDisabled("Удалить сохранённый пресет:");
+                ImGui.TextDisabled("Delete a saved preset:");
                 var custom = GetCustomPresets();
                 for (int i = 0; i < custom.Count; i++)
                 {
@@ -137,24 +137,24 @@ namespace ef2dg
                         break;
                     }
                 }
-                if (custom.Count == 0) ImGui.TextDisabled("Нет сохранённых пресетов.");
+                if (custom.Count == 0) ImGui.TextDisabled("No saved presets.");
                 ImGui.EndPopup();
             }
 
             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - 130);
             ImGui.InputText("##NewPresetName", ref _newPresetName, 64);
             ImGui.SameLine();
-            if (ImGui.Button("Сохранить пресет", new Vector2(-1, 0)) && !string.IsNullOrWhiteSpace(_newPresetName))
+            if (ImGui.Button("Save preset", new Vector2(-1, 0)) && !string.IsNullOrWhiteSpace(_newPresetName))
             {
                 SaveCustomPreset(_newPresetName.Trim(), scene.Lighting);
             }
-            Tip("Сохраняет текущие настройки в lighting_presets.json,\nчтобы применить их к другим уровням этой локации.");
+            Tip("Saves the current settings to lighting_presets.json\nso you can apply them to other levels of this location.");
         }
 
         private void DrawLightList(EditorContext ctx, EditorState state)
         {
-            if (ImGui.Button("+ Добавить источник света", new Vector2(-1, 0))) ImGui.OpenPopup("AddLightPopup");
-            Tip("Создаёт объект с LightComponent в центре камеры.");
+            if (ImGui.Button("+ Add light source", new Vector2(-1, 0))) ImGui.OpenPopup("AddLightPopup");
+            Tip("Creates an object with a LightComponent in the centre of the camera.");
 
             if (ImGui.BeginPopup("AddLightPopup"))
             {
@@ -177,7 +177,7 @@ namespace ef2dg
                 ImGui.ColorButton("##swatch", swatch, ImGuiColorEditFlags.NoTooltip, new Vector2(14, 14));
                 ImGui.SameLine();
 
-                string label = light.Enabled ? entity.Name : $"{entity.Name} (выкл.)";
+                string label = light.Enabled ? entity.Name : $"{entity.Name} (off)";
                 if (ImGui.Selectable(label, state.SelectedEntity == entity))
                 {
                     state.SelectedEntity = entity;
@@ -187,11 +187,11 @@ namespace ef2dg
                     var center = light.WorldPosition;
                     ctx.GameCamera.Position = new Vector3D<float>(center.X, center.Y, ctx.GameCamera.Position.Z);
                 }
-                Tip("Клик — выбрать и настроить в Inspector.\nДвойной клик — показать на сцене.");
+                Tip("Click — select and edit in the Inspector.\nDouble click — show in the scene.");
                 ImGui.PopID();
             }
 
-            if (lightCount == 0) ImGui.TextDisabled("В сцене пока нет источников света.");
+            if (lightCount == 0) ImGui.TextDisabled("The scene has no light sources yet.");
         }
 
         private static void CreateLight(EditorContext ctx, EditorState state, LightPreset preset)
@@ -212,16 +212,16 @@ namespace ef2dg
             state.SelectedEntity = entity;
         }
 
-        // Блок LightComponent в Inspector: понятные подписи, ограниченные диапазоны и пресеты вместо сырых чисел
+        // LightComponent block in the Inspector: clear labels, limited ranges and presets instead of raw numbers
         public static void DrawLightInspector(LightComponent light, Scene scene)
         {
             if (!scene.Lighting.Enabled)
             {
-                ImGui.TextColored(new Vector4(1.0f, 0.5f, 0.3f, 1.0f), "Освещение сцены выключено (окно Lighting).");
+                ImGui.TextColored(new Vector4(1.0f, 0.5f, 0.3f, 1.0f), "Scene lighting is off (Lighting window).");
             }
 
             ImGui.SetNextItemWidth(-1);
-            if (ImGui.BeginCombo("##LightPreset", "Пресет источника..."))
+            if (ImGui.BeginCombo("##LightPreset", "Source preset..."))
             {
                 foreach (var preset in LightingPresets.Lights)
                 {
@@ -231,33 +231,33 @@ namespace ef2dg
             }
 
             bool enabled = light.Enabled;
-            if (ImGui.Checkbox("Включён", ref enabled)) light.Enabled = enabled;
+            if (ImGui.Checkbox("Enabled", ref enabled)) light.Enabled = enabled;
 
             var color = new Vector3(light.Color.X, light.Color.Y, light.Color.Z);
-            color = Color3("Цвет", color, "Цвет света.");
+            color = Color3("Color", color, "Light colour.");
             light.Color = new Vector4D<float>(color.X, color.Y, color.Z, light.Color.W);
 
-            light.Intensity = Slider("Яркость", light.Intensity, 0f, 5f, "Больше 1 — поверхность пересвечивается и начинает светиться (bloom).");
+            light.Intensity = Slider("Brightness", light.Intensity, 0f, 5f, "Above 1 the surface is overexposed and starts to glow (bloom).");
 
             float radius = light.Radius;
-            if (ImGui.DragFloat("Радиус", ref radius, 0.02f, 0.05f, 30f, "%.2f")) light.Radius = MathF.Max(0.05f, radius);
-            Tip("Дальность света в мировых единицах (один тайл = 0.5).");
+            if (ImGui.DragFloat("Radius", ref radius, 0.02f, 0.05f, 30f, "%.2f")) light.Radius = MathF.Max(0.05f, radius);
+            Tip("Light range in world units (one tile = 0.5).");
 
             var offset = new Vector2(light.Offset.X, light.Offset.Y);
-            if (ImGui.DragFloat2("Смещение", ref offset, 0.01f)) light.Offset = new Vector2D<float>(offset.X, offset.Y);
-            Tip("Сдвиг источника от позиции объекта, например пламя над факелом.");
+            if (ImGui.DragFloat2("Offset", ref offset, 0.01f)) light.Offset = new Vector2D<float>(offset.X, offset.Y);
+            Tip("Source offset from the object position, for example a flame above a torch.");
 
-            light.Falloff = Slider("Спад к краю", light.Falloff, 0.2f, 4f, "Меньше 1 — ровное пятно, больше 1 — свет собран у центра.");
+            light.Falloff = Slider("Edge falloff", light.Falloff, 0.2f, 4f, "Below 1 — an even spot, above 1 — light concentrated in the centre.");
 
-            ImGui.SeparatorText("Ядро свечения");
-            light.Glow = Slider("Сила##glow", light.Glow, 0f, 4f, "Видимая светящаяся точка в центре: сфера, пламя, кристалл. 0 — нет.");
-            light.GlowSize = Slider("Размер##glow", light.GlowSize, 0.02f, 1f, "Размер ядра как доля радиуса.");
+            ImGui.SeparatorText("Glow core");
+            light.Glow = Slider("Strength##glow", light.Glow, 0f, 4f, "A visible glowing point in the centre: orb, flame, crystal. 0 — none.");
+            light.GlowSize = Slider("Size##glow", light.GlowSize, 0.02f, 1f, "Core size as a fraction of the radius.");
 
-            ImGui.SeparatorText("Анимация");
-            light.FlickerAmount = Slider("Мерцание", light.FlickerAmount, 0f, 1f, "Неровное дрожание огня. 0 — нет.");
-            light.FlickerSpeed = Slider("Скорость мерцания", light.FlickerSpeed, 0f, 30f, "");
-            light.PulseAmount = Slider("Пульсация", light.PulseAmount, 0f, 1f, "Плавное «дыхание» магии и кристаллов. 0 — нет.");
-            light.PulseSpeed = Slider("Скорость пульсации", light.PulseSpeed, 0f, 5f, "Пульсов в секунду.");
+            ImGui.SeparatorText("Animation");
+            light.FlickerAmount = Slider("Flicker", light.FlickerAmount, 0f, 1f, "Uneven fire flicker. 0 — none.");
+            light.FlickerSpeed = Slider("Flicker speed", light.FlickerSpeed, 0f, 30f, "");
+            light.PulseAmount = Slider("Pulse", light.PulseAmount, 0f, 1f, "Smooth “breathing” of magic and crystals. 0 — none.");
+            light.PulseSpeed = Slider("Pulse speed", light.PulseSpeed, 0f, 5f, "Pulses per second.");
         }
 
         private List<ScenePreset> GetCustomPresets()
@@ -306,7 +306,7 @@ namespace ef2dg
 
         private static float Slider(string label, float value, float min, float max, string tooltip)
         {
-            // Ctrl+клик по слайдеру позволяет ввести значение за пределами диапазона
+            // Ctrl+click on a slider lets you enter a value outside the range
             ImGui.SliderFloat(label, ref value, min, max, "%.2f");
             Tip(tooltip);
             return value;

@@ -12,7 +12,7 @@ namespace ef2dg
         
         private Texture _missingTexture; 
         
-        // НОВОЕ: Открываем доступ для Tilemap, чтобы он знал, что это заглушка
+        // Exposed to Tilemap so it can tell this is the placeholder
         public Texture MissingTexture => _missingTexture;
         public Texture WhiteTexture { get; private set; }
 
@@ -31,12 +31,12 @@ namespace ef2dg
 
         public Texture GetTexture(string path)
         {
-            if (_textures.ContainsKey(path)) return _textures[path]; // Flyweight: O(1) кеш
+            if (_textures.ContainsKey(path)) return _textures[path]; // Flyweight: O(1) cache
 
             if (!File.Exists(path)) 
             {
                 Console.WriteLine($"[ResourceManager] ERROR: File not found {path}. Using fallback texture.");
-                _textures.Add(path, _missingTexture); // кешуємо заглушку за цим ключем
+                _textures.Add(path, _missingTexture); // cache the placeholder under this key
                 return _missingTexture;
             }
 
@@ -50,7 +50,7 @@ namespace ef2dg
         {
             foreach (var texture in _textures.Values) 
             {
-                // Не удаляем заглушку в цикле, так как на нее могут ссылаться много путей
+                // Do not delete the placeholder in the loop: many paths may reference it
                 if (texture != _missingTexture) texture.Dispose();
             }
             _textures.Clear();

@@ -7,18 +7,18 @@ namespace ef2dg
 {
     public static unsafe class ImGuiConfigurator
     {
-        // Статический массив глифов: латиница, кириллица и типографские символы
+        // Static glyph array: Latin, Cyrillic and typographic symbols
         private static readonly ushort[] _customRanges = new ushort[]
         {
-            0x0020, 0x00FF, // ASCII и латиница
-            0x0400, 0x052F, // Кириллица (русский, украинский)
-            0x2000, 0x206F, // Пунктуация: длинное тире, многоточие, кавычки
-            0x2190, 0x21FF, // Стрелки
-            0x25A0, 0x25FF, // Геометрические фигуры (▶ ■), если они есть в шрифте
-            0               // Обязательный нуль-терминатор
+            0x0020, 0x00FF, // ASCII and Latin
+            0x0400, 0x052F, // Cyrillic (Russian, Ukrainian)
+            0x2000, 0x206F, // Punctuation: em dash, ellipsis, quotes
+            0x2190, 0x21FF, // Arrows
+            0x25A0, 0x25FF, // Geometric shapes (▶ ■), if the font has them
+            0               // Mandatory zero terminator
         };
 
-        // Дескриптор для вечной фиксации указателя в памяти C#
+        // Handle that pins the array in C# memory for the lifetime of the app
         private static GCHandle _rangesHandle;
 
         private static readonly string SystemUiFontPath = Path.Combine(
@@ -28,30 +28,30 @@ namespace ef2dg
         {
             var io = ImGui.GetIO();
 
-            // Включаем навигацию и поддержку докинга окон
+            // Enable navigation and window docking
             io.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard;
             io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;
 
-            // Устаревшая ручная таблица io.KeyMap ПОЛНОСТЬЮ УДАЛЕНА.
-            // Современный Silk.NET ImGuiController маршрутизирует клавиши автоматически.
+            // The obsolete manual io.KeyMap table has been REMOVED COMPLETELY.
+            // The modern Silk.NET ImGuiController routes keys automatically.
 
             EditorTheme.ApplyVsCodeDark();
 
-            // Загрузка кастомного шрифта: Segoe UI, как в VS Code на Windows, иначе шрифт проекта
+            // Custom font: Segoe UI, as in VS Code on Windows, otherwise the project font
             string fontPath = File.Exists(SystemUiFontPath) ? SystemUiFontPath : "assets/fonts/Roboto-Medium.ttf";
 
             if (File.Exists(fontPath))
             {
                 io.Fonts.Clear();
 
-                // Надежно фиксируем массив в неуправляемой памяти
+                // Reliably pin the array in unmanaged memory
                 if (!_rangesHandle.IsAllocated)
                 {
                     _rangesHandle = GCHandle.Alloc(_customRanges, GCHandleType.Pinned);
                 }
                 IntPtr rangesPtr = _rangesHandle.AddrOfPinnedObject();
 
-                // Загружаем шрифт с поддержкой русского/украинского языков
+                // Load a font that supports Russian/Ukrainian
                 io.Fonts.AddFontFromFileTTF(fontPath, 16.0f, default, rangesPtr);
                 
                 Console.WriteLine($"[ImGuiConfig] Successfully loaded Unicode font: {fontPath}");

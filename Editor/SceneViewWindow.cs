@@ -17,7 +17,7 @@ namespace ef2dg
         private Vector2 _viewportSize;
         private bool _hasViewport;
 
-        // Окно закрыто через меню View: игровой курсор не должен считаться внутри старого вьюпорта
+        // The window was closed through the View menu: the game cursor must not count as inside the old viewport
         public void MarkHidden() => _hasViewport = false;
 
         public void UpdateRuntimePointer(EditorState state, Camera camera)
@@ -54,13 +54,13 @@ namespace ef2dg
         {
             ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowPos(new Vector2(300, 20), ImGuiCond.FirstUseEver);
-            // Фон центральной области как у редактора кода в VS Code
+            // Central area background like the VS Code editor
             ImGui.PushStyleColor(ImGuiCol.WindowBg, EditorTheme.EditorBackground);
             ImGui.Begin(Title, ref IsOpen);
             ImGui.PopStyleColor();
 
             // =========================================================
-            // ДИНАМИЧЕСКИЙ РЕЕСТР СЦЕН (SCENE SELECTOR)
+            // DYNAMIC SCENE REGISTRY (SCENE SELECTOR)
             // =========================================================
             ImGui.TextColored(new Vector4(1.0f, 0.8f, 0.2f, 1.0f), "Editor Viewport:");
             ImGui.SameLine();
@@ -149,7 +149,7 @@ namespace ef2dg
                 _viewportSize = availableSize;
                 _hasViewport = true;
                 
-                // 1. Рендерим текстуру игры
+                // 1. Render the game texture
                 ImGui.Image((IntPtr)ctx.Fbo.TextureId, availableSize, new Vector2(0, 1), new Vector2(1, 0));
                 
                 var mousePos = ImGui.GetMousePos();
@@ -159,7 +159,7 @@ namespace ef2dg
                 bool isPlayMode = state.IsPlayMode;
                 bool isHoveringViewport = false;
 
-                // 2. ЗАХВАТ МЫШИ ДЛЯ ВЬЮПОРТА
+                // 2. MOUSE CAPTURE FOR THE VIEWPORT
                 if (!isPlayMode)
                 {
                     ImGui.SetCursorScreenPos(imageScreenPos);
@@ -177,10 +177,10 @@ namespace ef2dg
                     float wheel = ImGui.GetIO().MouseWheel;
                     if (wheel != 0)
                     {
-                        // Приближаем/отдаляем на 10% за каждый "щелчок" колесика
+                        // Zoom in/out by 10% per wheel "click"
                         ctx.GameCamera.Zoom -= wheel * 0.1f * ctx.GameCamera.Zoom;
                         
-                        // Ограничиваем от 0.1x (максимальное приближение) до 20.0x (максимальное отдаление)
+                        // Clamp between 0.1x (maximum zoom-in) and 20.0x (maximum zoom-out)
                         ctx.GameCamera.Zoom = MathF.Max(0.1f, MathF.Min(20.0f, ctx.GameCamera.Zoom));
                     }
                 }
@@ -194,7 +194,7 @@ namespace ef2dg
                     _isDraggingInViewport = false;
                 }
 
-                // 3. ОТРИСОВКА UI-КНОПОК (ПОЛНОСТЬЮ DATA-DRIVEN)
+                // 3. DRAWING UI BUTTONS (FULLY DATA-DRIVEN)
                 if (ctx.CurrentScene != null)
                 {
                     var endCursorPos = ImGui.GetCursorScreenPos();
@@ -214,12 +214,12 @@ namespace ef2dg
                             bool isBtnHovered = (relX >= entity.Position.X && relX <= entity.Position.X + btn.Size.X &&
                                                  relY >= entity.Position.Y && relY <= entity.Position.Y + btn.Size.Y);
 
-                            // Обновляем состояние наведения для компонента
+                            // Update the component's hover state
                             btn.IsHovered = isHoveringViewport && isBtnHovered;
 
                             var sprite = entity.GetComponent<SpriteComponent>();
                             
-                            // ВАРИАНТ А: Отрисовка текстуры из SpriteComponent без вмешательства в логику анимаций
+                            // OPTION A: draw the SpriteComponent texture without touching the animation logic
                             if (sprite != null)
                             {
                                 if (sprite.Texture != null)
@@ -238,7 +238,7 @@ namespace ef2dg
                                     }
                                 }
                             }
-                            // ВАРИАНТ Б: Стандартная текстовая кнопка ImGui
+                            // OPTION B: standard ImGui text button
                             else
                             {
                                 ImGui.SetCursorScreenPos(btnScreenPos);
@@ -269,7 +269,7 @@ namespace ef2dg
                 float worldX = ctx.GameCamera.Position.X + ndcX * (camWorldWidth / 2.0f);
                 float worldY = ctx.GameCamera.Position.Y + ndcY * (camWorldHeight / 2.0f);
 
-                // 4. ВЫДЕЛЕНИЕ СУЩНОСТЕЙ (ТОЛЬКО В РЕДАКТОРЕ)
+                // 4. ENTITY SELECTION (EDITOR ONLY)
                 if (isHoveringViewport && ctx.CurrentScene != null && !isPlayMode)
                 {
                     if (state.CurrentTool == EditorState.ToolMode.Select)
@@ -361,7 +361,7 @@ namespace ef2dg
                     state.HoveredGridCell = null;
                 }
 
-                // 5. НАДЕЖНОЕ ПЕРЕТАСКИВАНИЕ
+                // 5. RELIABLE DRAGGING
                 if (_isDraggingInViewport && state.SelectedEntity != null && state.CurrentTool == EditorState.ToolMode.Select && !isPlayMode)
                 {
                     var btn = state.SelectedEntity.GetComponent<ButtonComponent>();
@@ -377,7 +377,7 @@ namespace ef2dg
                     }
                 }
 
-                // 6. ОВЕРЛЕЙ: КООРДИНАТЫ КАМЕРЫ В УГЛУ
+                // 6. OVERLAY: CAMERA COORDINATES IN THE CORNER
                 string camText = $"Camera: ({ctx.GameCamera.Position.X:F2}, {ctx.GameCamera.Position.Y:F2})";
                 var textSize = ImGui.CalcTextSize(camText);
                 var camTextPos = new Vector2(imageScreenPos.X + availableSize.X - textSize.X - 10, imageScreenPos.Y + 10);

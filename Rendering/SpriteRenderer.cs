@@ -18,12 +18,12 @@ namespace ef2dg
         private readonly Shader _shader;
         private readonly Shader _debugShader;
 
-        // Статический quad остаётся отдельным только для debug.vert/debug.frag.
+        // The static quad stays separate only for debug.vert/debug.frag.
         private readonly VertexArrayObject<float> _debugVao;
         private readonly BufferObject<float> _debugVbo;
         private readonly BufferObject<uint> _debugEbo;
 
-        // Основной динамический multi-texture sprite batch.
+        // Main dynamic multi-texture sprite batch.
         private readonly uint _batchVao;
         private readonly uint _batchVbo;
         private readonly uint _batchEbo;
@@ -36,7 +36,7 @@ namespace ef2dg
         private Matrix4X4<float> _batchProjection;
         private bool _batchHasMatrices;
 
-        // Специализированный batch одноцветной UI-геометрии сохранён: он не требует texture sampling.
+        // The specialized solid-colour UI batch is kept: it needs no texture sampling.
         private readonly Shader _solidBatchShader;
         private readonly uint _solidBatchVao;
         private readonly uint _solidBatchVbo;
@@ -164,7 +164,7 @@ namespace ef2dg
                 return;
             }
 
-            // Нельзя держать одновременно sprite и solid batch: иначе нарушится порядок alpha blending.
+            // The sprite and solid batches must not hold data at the same time, otherwise alpha blending order breaks.
             Flush();
 
             float halfWidth = size.X * 0.5f;
@@ -260,7 +260,7 @@ namespace ef2dg
             bool flipX,
             Vector4D<float> color)
         {
-            // Текстурный quad должен оказаться после уже накопленной solid-геометрии.
+            // The textured quad must come after the already accumulated solid geometry.
             FlushSolidBatch();
 
             Matrix4X4<float> view = camera.GetViewMatrix();
@@ -349,7 +349,7 @@ namespace ef2dg
 
         public void FlushAll()
         {
-            // Оба типа batch не должны содержать данные одновременно, но такой порядок безопасен и при ошибочном вызове.
+            // Both batch types must not hold data at once, but this order is safe even after a wrong call.
             FlushSolidBatch();
             Flush();
         }

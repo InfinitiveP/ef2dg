@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace ef2dg
 {
-    // Главное меню, закреплённое у верхнего края окна: File / Edit / View / Run / Help и кнопка Play по центру
+    // Main menu pinned to the top edge of the window: File / Edit / View / Run / Help and the Play button in the middle
     public class MainMenuBar
     {
         private bool _showShortcuts;
@@ -12,7 +12,7 @@ namespace ef2dg
 
         public void Draw(EditorContext ctx, EditorState state, IReadOnlyList<EditorWindow> windows, EditorLayout layout)
         {
-            // Выделение пунктов меню синее, как в VS Code; в остальных списках остаётся серое
+            // Menu item highlight is blue, as in VS Code; other lists stay grey
             ImGui.PushStyleColor(ImGuiCol.HeaderHovered, EditorTheme.MenuSelection);
             ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(8f, 6f));
             if (ImGui.BeginMainMenuBar())
@@ -36,7 +36,7 @@ namespace ef2dg
         public void HandleShortcuts(EditorContext ctx, EditorState state)
         {
             var io = ImGui.GetIO();
-            // Пока вводится текст, Ctrl+Z/Ctrl+S и т. п. принадлежат полю ввода
+            // While text is being typed, Ctrl+Z/Ctrl+S etc. belong to the input field
             if (io.WantTextInput || !io.KeyCtrl) return;
 
             if (Pressed(ImGuiKey.S))
@@ -153,7 +153,7 @@ namespace ef2dg
             ImGui.EndMenu();
         }
 
-        // Кнопка с нарисованной иконкой: шрифт не содержит символов ▶ и ■
+        // Button with a drawn icon: the font has no ▶ and ■ glyphs
         private static void DrawPlayButton(EditorContext ctx, EditorState state)
         {
             float height = ImGui.GetFrameHeight();

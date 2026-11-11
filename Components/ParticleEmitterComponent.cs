@@ -21,28 +21,28 @@ namespace ef2dg
 
     public class ParticleEmitterComponent : Component
     {
-        // Текстура частицы (если пусто, берется заглушка)
+        // Particle texture (if empty, a placeholder is used)
         public string TexturePath { get; set; } = "";
 
-        // Настройки эмиттера
+        // Emitter settings
         public int MaxParticles { get; set; } = 100;
-        public float EmitRate { get; set; } = 20.0f; // Частиц в секунду
+        public float EmitRate { get; set; } = 20.0f; // Particles per second
         public bool IsLooping { get; set; } = true;
         
-        // Физика частицы
+        // Particle physics
         public Vector2D<float> VelocityBase { get; set; } = new Vector2D<float>(0.0f, 1.0f);
         public Vector2D<float> VelocityRandomRange { get; set; } = new Vector2D<float>(0.5f, 0.3f);
         public Vector2D<float> SpawnOffsetRange { get; set; } = new Vector2D<float>(0.2f, 0.0f);
         public float Gravity { get; set; } = 0.0f;
 
-        // Жизнь и размер
+        // Lifetime and size
         public float ParticleLifetime { get; set; } = 1.5f;
         public float StartSize { get; set; } = 0.1f;
         public float EndSize { get; set; } = 0.02f;
 
-        // Цвет (R, G, B, A) в начале и в конце
-        public Vector4D<float> StartColor { get; set; } = new Vector4D<float>(1.0f, 0.6f, 0.1f, 1.0f); // Оранжевый
-        public Vector4D<float> EndColor { get; set; } = new Vector4D<float>(0.2f, 0.0f, 0.0f, 0.0f);   // Прозрачный красный
+        // Colour (R, G, B, A) at the start and at the end
+        public Vector4D<float> StartColor { get; set; } = new Vector4D<float>(1.0f, 0.6f, 0.1f, 1.0f); // Orange
+        public Vector4D<float> EndColor { get; set; } = new Vector4D<float>(0.2f, 0.0f, 0.0f, 0.0f);   // Transparent red
 
         private Particle[] _particles = Array.Empty<Particle>();
         private float _emitTimer = 0.0f;
@@ -61,7 +61,7 @@ namespace ef2dg
                 _particles = new Particle[MaxParticles];
             }
 
-            // Спавн новых частиц
+            // Spawn new particles
             if (IsLooping && EmitRate > 0)
             {
                 _emitTimer += deltaTime;
@@ -74,7 +74,7 @@ namespace ef2dg
                 }
             }
 
-            // Обновление живых частиц
+            // Update living particles
             for (int i = 0; i < _particles.Length; i++)
             {
                 if (!_particles[i].IsAlive) continue;
@@ -120,13 +120,13 @@ namespace ef2dg
 
         public override void Draw(SpriteRenderer renderer, Camera camera)
         {
-            // Динамически получаем нужную текстуру каждый кадр
-            // ResourceManager сам кэширует картинки, так что это безопасно
+            // Get the required texture dynamically every frame
+            // ResourceManager caches images itself, so this is safe
             Texture currentTexture;
             
             if (string.IsNullOrEmpty(TexturePath))
             {
-                currentTexture = Engine.Resources.WhiteTexture; // Используем белый квадрат!
+                currentTexture = Engine.Resources.WhiteTexture; // Use the white square!
             }
             else
             {
@@ -151,7 +151,7 @@ namespace ef2dg
                     _particles[i].StartColor.W + (_particles[i].EndColor.W - _particles[i].StartColor.W) * t
                 );
 
-                // ИСПОЛЬЗУЕМ НОВОЕ ИМЯ МЕТОДА
+                // USE THE NEW METHOD NAME
                 renderer.DrawColored(
                     currentTexture,
                     _particles[i].Position,

@@ -8,8 +8,8 @@ namespace ef2dg
     {
         public float DefaultCameraZoom { get; set; } = 1.0f;
         public Vector4 BackgroundColor { get; set; } = new Vector4(0.2f, 0.3f, 0.3f, 1.0f);
-        // Устаревшие глобальные настройки света: теперь освещение задаётся у каждой сцены (SceneLighting).
-        // Используются только для уровней, сохранённых до этого изменения.
+        // Obsolete global light settings: lighting is now set per scene (SceneLighting).
+        // Used only for levels saved before this change.
         public Vector4 AmbientLightColor { get; set; } = new Vector4(0.1f, 0.1f, 0.15f, 1.0f);
         public bool EnableLighting { get; set; } = false;
     }

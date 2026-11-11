@@ -10,7 +10,7 @@ namespace ef2dg
 
         public static bool IsEditorMode = true;
 
-        // Показывать освещение сцены в режиме редактирования (в Play Mode оно включено всегда)
+        // Show scene lighting in Edit Mode (in Play Mode it is always on)
         public static bool PreviewLightingInEditor = true;
     }
 }

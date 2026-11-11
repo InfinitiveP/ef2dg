@@ -7,7 +7,7 @@ namespace ef2dg
         public float SmoothSpeed { get; set; } = 5.0f;
         public Vector2D<float> Offset { get; set; } = new Vector2D<float>(0, 0);
 
-        // Перехватываем камеру из рендера и запоминаем её для всей игры
+        // Capture the camera from rendering and remember it for the whole game
         private static Camera? _globalCamera;
 
         public override void FixedUpdate(float deltaTime)
@@ -28,7 +28,7 @@ namespace ef2dg
 
         public override void Draw(SpriteRenderer renderer, Camera camera)
         {
-            // Запоминаем камеру один раз при первой отрисовке
+            // Remember the camera once, on the first draw
             if (_globalCamera == null) _globalCamera = camera;
         }
     }

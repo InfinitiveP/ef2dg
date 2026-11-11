@@ -79,7 +79,7 @@ namespace ef2dg
                         map.TileConfigs[state.SelectedTilePath] = config;
                     }
 
-                    // НАСТРОЙКИ КАРТИНКИ
+                    // IMAGE SETTINGS
                     System.Numerics.Vector2 tScale = new System.Numerics.Vector2(config.TextureScale.X, config.TextureScale.Y);
                     if (ImGui.DragFloat2("Texture Scale", ref tScale, 0.05f)) config.TextureScale = new Vector2D<float>(tScale.X, tScale.Y);
 
@@ -94,7 +94,7 @@ namespace ef2dg
                     if (ImGui.DragFloat("Anim Speed", ref aSpeed, 0.1f, 0f, 60f)) config.AnimationSpeed = aSpeed;
                     ImGui.Spacing();
 
-                    // НОВОЕ: Отражение (Flip)
+                    // Flip
                     bool fX = config.FlipX;
                     if (ImGui.Checkbox("Flip X", ref fX)) config.FlipX = fX;
                     ImGui.SameLine();
@@ -103,7 +103,7 @@ namespace ef2dg
 
                     ImGui.Spacing();
 
-                    // НАСТРОЙКИ КОЛЛИЗИИ
+                    // COLLISION SETTINGS
                     int colType = (int)config.CollisionType;
                     string[] colNames = { "None (Ghost)", "Solid (Square)", "Slope Left (\\)", "Slope Right (/)" };
                     if (ImGui.BeginCombo("Tile Collision", colNames[colType]))

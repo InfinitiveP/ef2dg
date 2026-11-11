@@ -17,20 +17,20 @@ namespace ef2dg
 
             unsafe
             {
-                // Рассчитываем размер одного элемента (float)
+                // Compute the size of one element (float)
                 uint sizeType = (uint)sizeof(TDataType);
                 
-                // Шаг (Stride) = 5 элементов (3 позиция + 2 текстура) * размер типа
-                // Если массив float, то 5 * 4 байта = 20 байт шаг
+                // Stride = 5 elements (3 position + 2 texture) * type size
+                // For a float array, 5 * 4 bytes = 20-byte stride
                 uint stride = 5 * sizeType; 
 
-                // --- Атрибут 0: Позиция (X, Y, Z) ---
-                // 3 компонента, смещение (offset) = 0
+                // --- Attribute 0: position (X, Y, Z) ---
+                // 3 components, offset = 0
                 _gl.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride, (void*)0);
                 _gl.EnableVertexAttribArray(0);
 
-                // --- Атрибут 1: Текстура (U, V) ---
-                // 2 компонента, смещение = 3 элемента * размер типа (пропускаем X, Y, Z)
+                // --- Attribute 1: texture (U, V) ---
+                // 2 components, offset = 3 elements * type size (skip X, Y, Z)
                 _gl.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, stride, (void*)(3 * sizeType));
                 _gl.EnableVertexAttribArray(1);
             }

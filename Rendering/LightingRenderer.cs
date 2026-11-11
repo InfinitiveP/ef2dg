@@ -6,12 +6,12 @@ using Silk.NET.OpenGL;
 
 namespace ef2dg
 {
-    // 2D-освещение сцены: карта света (HDR), видимое свечение источников, bloom и цветокоррекция.
-    // Берёт уже нарисованный мир из target и записывает освещённый результат обратно в него.
+    // 2D scene lighting: an HDR light map, visible source glow, bloom and colour grading.
+    // Takes the already drawn world from target and writes the lit result back into it.
     public sealed class LightingRenderer : IDisposable
     {
         private const int MaxQuads = 1024;
-        private const int FloatsPerVertex = 9; // XY, локальные координаты (-1..1), RGBA, falloff
+        private const int FloatsPerVertex = 9; // XY, local coordinates (-1..1), RGBA, falloff
         private const int BloomDownscale = 4;
         private const int BlurIterations = 2;
         private const float GlowFalloff = 2f;
@@ -30,7 +30,7 @@ namespace ef2dg
         private int _quadVertexFloatCount;
         private int _quadCount;
 
-        // Пустой VAO: полноэкранный треугольник строится в fullscreen.vert из gl_VertexID
+        // Empty VAO: the full-screen triangle is built in fullscreen.vert from gl_VertexID
         private readonly uint _fullscreenVao;
 
         private readonly Framebuffer _lightMap;
@@ -110,13 +110,13 @@ namespace ef2dg
             _bloomB = new Framebuffer(_gl, 200, 150, hdr: true, linear: true);
         }
 
-        // Перед вызовом sprite batch должен быть сброшен: проход меняет render target и blend state
+        // The sprite batch must be flushed before the call: the pass changes the render target and blend state
         public void Apply(Scene scene, Framebuffer target, Camera camera, float time)
         {
             var settings = scene.Lighting;
             EnsureSize(target.Width, target.Height);
 
-            // 1. Карта освещения: фон = ambient, источники складываются аддитивно и могут быть ярче 1.0
+            // 1. Light map: background = ambient, sources add up and may be brighter than 1.0
             _lightMap.Bind();
             Vector3 ambient = settings.AmbientColor * settings.AmbientIntensity;
             _gl.ClearColor(ambient.X, ambient.Y, ambient.Z, 1f);
@@ -129,7 +129,7 @@ namespace ef2dg
             CollectLights(scene, camera, time, settings.LightMultiplier);
             FlushQuads();
 
-            // 2. Освещённая сцена = исходные пиксели * карта освещения
+            // 2. Lit scene = source pixels * light map
             _litScene.Bind();
             _gl.Disable(EnableCap.Blend);
             _compositeShader.Use();
@@ -137,7 +137,7 @@ namespace ef2dg
             BindTexture(1, _lightMap.TextureId);
             DrawFullscreen();
 
-            // 3. Видимое ядро источников поверх освещённой сцены
+            // 3. Visible source cores on top of the lit scene
             if (_glowQuads.Count > 0)
             {
                 _gl.Enable(EnableCap.Blend);
@@ -148,10 +148,10 @@ namespace ef2dg
                 _gl.Disable(EnableCap.Blend);
             }
 
-            // 4. Bloom: выделяем яркие пиксели в уменьшенный буфер и размываем
+            // 4. Bloom: extract bright pixels into a downscaled buffer and blur them
             if (settings.BloomStrength > 0f) RenderBloom(settings);
 
-            // 5. Цветокоррекция и виньетка, результат возвращается в исходный буфер
+            // 5. Colour grading and vignette; the result goes back into the source buffer
             target.Bind();
             _finalShader.Use();
             _finalShader.SetUniform("uBloomStrength", MathF.Max(0f, settings.BloomStrength));
@@ -187,7 +187,7 @@ namespace ef2dg
                 light.Evaluate(time, out float intensity, out float radius, out float glow);
                 if (radius <= 0f) continue;
 
-                // Источники за пределами кадра не влияют на видимые пиксели
+                // Sources outside the frame do not affect visible pixels
                 Vector2D<float> center = light.WorldPosition;
                 if (MathF.Abs(center.X - camera.Position.X) > halfWidth + radius ||
                     MathF.Abs(center.Y - camera.Position.Y) > halfHeight + radius) continue;
@@ -225,7 +225,7 @@ namespace ef2dg
             }
         }
 
-        // Гизмо редактора: ромб в цвете источника и окружность радиуса (ярче у выбранного объекта)
+        // Editor gizmo: a diamond in the source colour and a radius circle (brighter for the selected object)
         public static void DrawGizmos(Scene scene, Camera camera, SpriteRenderer renderer, Texture white,
             GameObject? selected, int viewportHeight)
         {

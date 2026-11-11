@@ -17,7 +17,7 @@ namespace ef2dg
         void PlayMusic(string musicPath, float volume = 0.5f);
         void StopMusic(); 
         
-        // ИСПРАВЛЕНИЕ: Добавляем контракт принудительной остановки в интерфейс
+        // Fix: add a forced-stop contract to the interface
         void StopAll();   
 
         void PauseAll();  
@@ -33,7 +33,7 @@ namespace ef2dg
         public void PlayMusic(string musicPath, float volume = 0.5f) { }
         public void StopMusic() { }
         
-        // Безопасная заглушка для Null-сервиса
+        // Safe stub for the null service
         public void StopAll() { } 
 
         public void PauseAll() { }  

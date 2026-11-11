@@ -9,8 +9,8 @@ uniform sampler2D uTextures[16];
 
 vec4 SampleBatchTexture(int index, vec2 uv)
 {
-    // Явные ветви сохраняют совместимость с драйверами OpenGL 3.3,
-    // где динамическая индексация массива sampler2D может быть ограничена.
+    // Explicit branches keep compatibility with OpenGL 3.3 drivers,
+    // where dynamic indexing of a sampler2D array may be restricted.
     switch (index)
     {
         case 0: return texture(uTextures[0], uv);

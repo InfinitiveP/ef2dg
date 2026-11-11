@@ -10,14 +10,14 @@ namespace ef2dg
         private uint _handle;
         private GL _gl;
         
-        // Флаг, который запретит удалять чужую текстуру из памяти
+        // Flag that prevents deleting a texture owned by someone else
         private bool _ownsHandle = true;
 
         public int Width { get; private set; }
         public int Height { get; private set; }
         public uint Handle => _handle;
 
-        // 1. Конструктор для загрузки из файла
+        // 1. Constructor for loading from a file
         public unsafe Texture(GL gl, string path)
         {
             _gl = gl;
@@ -38,7 +38,7 @@ namespace ef2dg
             SetParameters();
         }
 
-        // 2. Конструктор для создания текстуры-заглушки из байтов в памяти
+        // 2. Constructor for creating a placeholder texture from bytes in memory
         public unsafe Texture(GL gl, int width, int height, byte[] data)
         {
             _gl = gl;
@@ -54,15 +54,15 @@ namespace ef2dg
             SetParameters();
         }
 
-        // 3. НОВОЕ: Обертка для текстур, уже созданных Фреймбуфером
+        // 3. Wrapper for textures already created by a Framebuffer
         public Texture(GL gl, uint handle, int width, int height)
         {
             _gl = gl;
-            _handle = handle; // Берем готовый ID от Фреймбуфера
+            _handle = handle; // Take the ready ID from the Framebuffer
             Width = width;
             Height = height;
             
-            // ВАЖНО: Эта текстура нам не принадлежит, её удалит сам Framebuffer, когда придет время
+            // IMPORTANT: this texture is not ours; the Framebuffer deletes it when the time comes
             _ownsHandle = false; 
         }
 
@@ -82,7 +82,7 @@ namespace ef2dg
 
         public void Dispose()
         {
-            // Удаляем текстуру только если сами её создали
+            // Delete the texture only if we created it ourselves
             if (_ownsHandle) 
             {
                 _gl.DeleteTexture(_handle);

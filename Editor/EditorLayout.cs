@@ -10,16 +10,16 @@ using System.Text.Json;
 
 namespace ef2dg
 {
-    // Раскладка редактора в стиле VS Code: область докинга на всё окно между главным меню и строкой состояния,
-    // раскладка по умолчанию и сохранение видимости окон между запусками.
+    // VS Code-style editor layout: a docking area over the whole window between the main menu and the status bar,
+    // the default layout and saving window visibility between launches.
     public class EditorLayout
     {
         public const string SettingsFileName = "editor_layout.json";
 
-        // Увеличить, если поменялась раскладка по умолчанию: у всех применится новая при следующем запуске
+        // Increase when the default layout changes: everyone gets the new one on the next launch
         private const int CurrentLayoutVersion = 1;
 
-        // ImGuiDockNodeFlags_DockSpace — внутренний флаг imgui, в обёртке ImGui.NET его нет
+        // ImGuiDockNodeFlags_DockSpace is an internal imgui flag missing from the ImGui.NET wrapper
         private const int DockSpaceNodeFlag = 1 << 10;
 
         private class LayoutSettings
@@ -28,7 +28,7 @@ namespace ef2dg
             public Dictionary<string, bool> OpenWindows { get; set; } = new();
         }
 
-        // Вкладки, которые после сброса раскладки должны быть активными в своих панелях (последняя получает фокус)
+        // Tabs that must be active in their panels after a layout reset (the last one gets focus)
         private static readonly string[] DefaultActiveTabs = { "Console (Terminal)", "Inspector", "Hierarchy", "Scene View" };
 
         private readonly IReadOnlyList<EditorWindow> _windows;
@@ -46,7 +46,7 @@ namespace ef2dg
 
         public void RequestReset() => _resetRequested = true;
 
-        // Окно-хост с DockSpace. inHost рисуется внутри хоста: там живут модальные диалоги
+        // Host window with the DockSpace. inHost is drawn inside the host: modal dialogs live there
         public void DrawDockHost(Action inHost)
         {
             var viewport = ImGui.GetMainViewport();
@@ -76,7 +76,7 @@ namespace ef2dg
             ImGui.End();
         }
 
-        // Строка состояния внизу: синяя в режиме редактирования, оранжевая в Play Mode (как отладка в VS Code)
+        // Bottom status bar: blue in edit mode, orange in Play Mode (like debugging in VS Code)
         public void DrawStatusBar(EditorContext ctx, EditorState state)
         {
             var viewport = ImGui.GetMainViewport();
@@ -122,7 +122,7 @@ namespace ef2dg
             ImGui.PopStyleColor(2);
         }
 
-        // Как в VS Code: слева иерархия и ассеты, по центру сцена, справа инспектор, снизу консоль
+        // As in VS Code: hierarchy and assets on the left, the scene in the centre, the inspector on the right, the console at the bottom
         private void BuildDefaultLayout(uint dockId, Vector2 size)
         {
             DockBuilderRemoveNode(dockId);
@@ -143,7 +143,7 @@ namespace ef2dg
             Dock("Console (Terminal)", bottom);
             Dock("Tile Palette", bottom);
             Dock("Project Settings", bottom);
-            // Toolbar дублирует меню и по умолчанию скрыт; если его открыть, он будет плавающим
+            // The Toolbar duplicates the menu and is hidden by default; if opened, it floats
             Dock("Toolbar", 0);
             DockBuilderFinish(dockId);
 
@@ -151,12 +151,12 @@ namespace ef2dg
             _focusDefaultTabs = true;
         }
 
-        // Вызывается после отрисовки всех окон кадра
+        // Called after every window of the frame has been drawn
         public void EndFrame()
         {
             if (_focusDefaultTabs)
             {
-                // Окна уже пристыкованы в этом кадре — фокус выбирает нужную вкладку в каждой панели
+                // Windows are already docked in this frame — focus picks the right tab in each panel
                 _focusDefaultTabs = false;
                 foreach (string title in DefaultActiveTabs) ImGui.SetWindowFocus(title);
             }
@@ -200,7 +200,7 @@ namespace ef2dg
                 }
             }
 
-            // Первый запуск новой раскладки: строим её в первом кадре
+            // First launch of a new layout: build it in the first frame
             if (settings == null || settings.LayoutVersion < CurrentLayoutVersion)
             {
                 _resetRequested = true;
@@ -217,7 +217,7 @@ namespace ef2dg
         private string BuildSnapshot() => string.Join(",", _windows.Select(w => w.IsOpen ? "1" : "0"));
 
         // =========================================================
-        // DockBuilder из imgui_internal.h: экспортируется нативной cimgui.dll, но не обёрнут в ImGui.NET
+        // DockBuilder from imgui_internal.h: exported by the native cimgui.dll but not wrapped by ImGui.NET
         // =========================================================
         [DllImport("cimgui", CallingConvention = CallingConvention.Cdecl, EntryPoint = "igDockBuilderAddNode")]
         private static extern uint DockBuilderAddNode(uint nodeId, int flags);
@@ -238,7 +238,7 @@ namespace ef2dg
         [DllImport("cimgui", CallingConvention = CallingConvention.Cdecl, EntryPoint = "igDockBuilderFinish")]
         private static extern void DockBuilderFinish(uint nodeId);
 
-        // Отрезает от node часть со стороны dir и возвращает её id; в node остаётся оставшаяся часть
+        // Splits off the part of node on the dir side and returns its id; the remaining part stays in node
         private static unsafe uint Split(ref uint node, ImGuiDir dir, float ratio)
         {
             uint atDir;

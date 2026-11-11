@@ -4,15 +4,15 @@ namespace ef2dg
 {
     public class PhysicsBody : Component
     {
-        // Хранит триггеры, внутри которых мы СЕЙЧАС находимся
+        // Triggers we are CURRENTLY inside
         private System.Collections.Generic.HashSet<GameObject> _activeTriggers = new System.Collections.Generic.HashSet<GameObject>();
         public Vector2D<float> HitboxSize { get; set; }
         public Vector2D<float> HitboxOffset { get; set; }
         public Vector2D<float> Velocity { get; set; } = new Vector2D<float>(0, 0);
-        public float GravityScale { get; set; } = 1.0f; // 1 = Платформер, 0 = Вид сверху
+        public float GravityScale { get; set; } = 1.0f; // 1 = platformer, 0 = top-down view
         public bool IsGrounded { get; set; } = false;
         
-        // НОВОЕ: Галочка в Инспекторе для включения/выключения системы Step-Up
+        // Inspector checkbox for enabling/disabling the Step-Up system
         public bool EnableStepUp { get; set; } = true;
 
         public Tilemap Map { get; set; } = null!; 
@@ -35,7 +35,7 @@ namespace ef2dg
             
             float skin = 0.03f;
 
-            //ПЕРЕВІРКА ПО ОСІ X (З КРОКОМ)
+            // X AXIS CHECK (WITH STEP-UP)
             float nextX = pos.X + Velocity.X * deltaTime;
             float pLeftX = nextX + HitboxOffset.X - HitboxSize.X / 2f;
             float pRightX = nextX + HitboxOffset.X + HitboxSize.X / 2f;
@@ -45,8 +45,8 @@ namespace ef2dg
 
             float stepUp = 0f;
             
-            // У режимі виду зверху (GravityScale == 0) зашагування не потрібне, 
-            // воно викликає прилипання до стін.
+            // In top-down mode (GravityScale == 0) step-up is not needed,
+            // it causes sticking to walls.
             if (EnableStepUp && GravityScale > 0)
             {
                 var nextFloor = Map.GetSlopeFloorY(pLeftX, pRightX, pBottomX, true);
@@ -82,7 +82,7 @@ namespace ef2dg
                 Velocity = new Vector2D<float>(0, Velocity.Y);
             }
 
-            // --- 2. ПРОВЕРКА ПО ОСИ Y (ПОЛ И ПОТОЛОК) ---
+            // --- 2. Y AXIS CHECK (FLOOR AND CEILING) ---
             float nextY = pos.Y + Velocity.Y * deltaTime;
             float pLeftY = pos.X + HitboxOffset.X - HitboxSize.X / 2f + skin;
             float pRightY = pos.X + HitboxOffset.X + HitboxSize.X / 2f - skin;
@@ -94,7 +94,7 @@ namespace ef2dg
             
             bool resolvedFloor = false;
 
-            // Прилипание к полу/склонам также работает только для платформера
+            // Snapping to the floor/slopes also works only for the platformer
             if (EnableStepUp && GravityScale > 0)
             {
                 var floorUnder = Map.GetSlopeFloorY(pLeftY, pRightY, pBottomY, true);
@@ -114,7 +114,7 @@ namespace ef2dg
                 }
             }
 
-            // Если мы не прилипли к полу (или находимся в режиме вида сверху), проверяем чистую коллизию
+            // If we did not snap to the floor (or are in top-down mode), check plain collision
             if (!resolvedFloor)
             {
                 if (!Map.HasCollision(pLeftY, pRightY, pTopY, pBottomY))
@@ -131,7 +131,7 @@ namespace ef2dg
             Owner.Position = pos;
 
             // =======================================================
-            // --- 3. СКАНИРОВАНИЕ ТРИГГЕРОВ (С поддержкой Stay) ---
+            // --- 3. TRIGGER SCAN (with Stay support) ---
             // =======================================================
             if (Owner.ParentScene != null)
             {

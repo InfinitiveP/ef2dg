@@ -21,7 +21,7 @@ namespace ef2dg
         public static float UiPointerWheel { get; private set; }
         public static float UiPointerWheelHorizontal { get; private set; }
         
-        // Словарь: Название действия -> Кнопка
+        // Dictionary: action name -> key
         public static Dictionary<string, Key> Bindings { get; set; } = new Dictionary<string, Key>();
 
         public static void Init(IKeyboard keyboard)
@@ -45,13 +45,13 @@ namespace ef2dg
             return value;
         }
 
-        // Проверка по НАЗВАНИЮ ДЕЙСТВИЯ (например, "Jump")
+        // Check by ACTION NAME (for example, "Jump")
         public static bool IsActionPressed(string actionName)
         {
             if (_keyboard == null) return false;
             if (Bindings.TryGetValue(actionName, out Key mappedKey))
             {
-                // ИСПРАВЛЕНИЕ: Защита от краша! Если кнопка Unknown (-1), просто игнорируем
+                // Crash guard: if the key is Unknown (-1), just ignore it
                 if (mappedKey == Key.Unknown || (int)mappedKey == -1) return false; 
                 
                 return _keyboard.IsKeyPressed(mappedKey);
@@ -59,11 +59,11 @@ namespace ef2dg
             return false; 
         }
 
-        // Прямая проверка кнопки (для технических нужд)
+        // Direct key check (for technical needs)
         public static bool IsKeyPressed(Key key) => _keyboard?.IsKeyPressed(key) ?? false;
 
-        // Координаты задаются Scene View уже в экранном пространстве игровой UI-камеры.
-        // Это позволяет runtime UI корректно работать внутри docked viewport редактора.
+        // Scene View provides coordinates already in the screen space of the game UI camera.
+        // This lets runtime UI work correctly inside the editor's docked viewport.
         public static void SetUiPointerState(Vector2D<float> position, Vector2D<float> worldPosition, bool inside, bool leftDown, bool rightDown, bool middleDown, float wheel, float wheelHorizontal)
         {
             UiPointerPosition = position;
@@ -80,28 +80,28 @@ namespace ef2dg
         {
             if (_keyboard == null) return Key.Unknown;
 
-            // Перебираем все возможные кнопки из Silk.NET
+            // Iterate over every possible Silk.NET key
             foreach (Key key in System.Enum.GetValues(typeof(Key)))
             {
-                // Игнорируем технические значения
+                // Ignore technical values
                 if (key == Key.Unknown || (int)key == -1) continue;
 
                 if (_keyboard.IsKeyPressed(key))
                 {
-                    return key; // Возвращаем ту, которую сейчас держит пользователь
+                    return key; // Return the key the user is currently holding
                 }
             }
             return Key.Unknown;
         }
 
-        // Сохранение настроек управления в файл
+        // Save control bindings to a file
         public static void SaveBindings()
         {
             string json = JsonSerializer.Serialize(Bindings, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText("bindings.json", json);
         }
 
-        // Загрузка настроек
+        // Load control bindings
         public static void LoadBindings()
         {
             if (File.Exists("bindings.json"))
@@ -110,18 +110,18 @@ namespace ef2dg
                 Bindings = JsonSerializer.Deserialize<Dictionary<string, Key>>(json) ?? new Dictionary<string, Key>();
             }
 
-            // ИСПРАВЛЕНИЕ: Безопасное добавление недостающих кнопок. 
-            // Если мы добавили в код новое действие (например "Up"), оно само появится в старом конфиге!
+            // Safely add missing keys.
+            // If a new action (e.g. "Up") was added in code, it appears in an old config automatically!
             bool needsSave = false;
             
             if (!Bindings.ContainsKey("Left")) { Bindings["Left"] = Key.A; needsSave = true; }
             if (!Bindings.ContainsKey("Right")) { Bindings["Right"] = Key.D; needsSave = true; }
-            if (!Bindings.ContainsKey("Up")) { Bindings["Up"] = Key.W; needsSave = true; }       // <--- НОВОЕ
-            if (!Bindings.ContainsKey("Down")) { Bindings["Down"] = Key.S; needsSave = true; }   // <--- НОВОЕ
+            if (!Bindings.ContainsKey("Up")) { Bindings["Up"] = Key.W; needsSave = true; }       // added later
+            if (!Bindings.ContainsKey("Down")) { Bindings["Down"] = Key.S; needsSave = true; }   // added later
             if (!Bindings.ContainsKey("Jump")) { Bindings["Jump"] = Key.Space; needsSave = true; }
             if (!Bindings.ContainsKey("Attack")) { Bindings["Attack"] = Key.F; needsSave = true; }
 
-            // Сохраняем файл только если мы дописали туда новые дефолтные кнопки
+            // Save the file only if new default keys were added
             if (needsSave) SaveBindings(); 
         }
     }

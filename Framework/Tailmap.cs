@@ -18,8 +18,8 @@ namespace ef2dg
         public Vector2D<float> HitboxOffset { get; set; } = new Vector2D<float>(0f, 0f);
         public TileCollisionType CollisionType { get; set; } = TileCollisionType.Solid;
 
-        public int FrameCount { get; set; } = 1;       // Сколько кадров в картинке (по умолчанию 1)
-        public float AnimationSpeed { get; set; } = 5f; // Кадров в секунду
+        public int FrameCount { get; set; } = 1;       // Number of frames in the image (1 by default)
+        public float AnimationSpeed { get; set; } = 5f; // Frames per second
     }
 
     public class TileLayer
@@ -56,26 +56,26 @@ namespace ef2dg
             if (layerIndex < 0 || layerIndex >= Layers.Count) return;
             var layer = Layers[layerIndex];
 
-            // 1. Вычисляем половину ширины и высоты обзора камеры
+            // 1. Compute half of the camera view width and height
             float halfW = camera.ViewWidth / 2f;
             float halfH = camera.ViewHeight / 2f;
 
-            // 2. Переводим мировые координаты экрана в координаты клеток (Grid)
-            // Добавляем буфер (-2 и +2 клетки по краям), чтобы тайлы не исчезали резко на границе экрана
+            // 2. Convert the screen's world coordinates into grid cell coordinates
+            // Add a margin (-2 and +2 cells at the edges) so tiles do not pop out abruptly at the screen border
             int minX = (int)MathF.Floor((camera.Position.X - halfW) / TileSizeInWorld) - 2;
             int maxX = (int)MathF.Ceiling((camera.Position.X + halfW) / TileSizeInWorld) + 2;
             int minY = (int)MathF.Floor((camera.Position.Y - halfH) / TileSizeInWorld) - 2;
             int maxY = (int)MathF.Ceiling((camera.Position.Y + halfH) / TileSizeInWorld) + 2;
 
-            // 3. ВМЕСТО FOREACH ПО ВСЕЙ КАРТЕ, ИДЕМ ТОЛЬКО ПО ВИДИМОМУ КВАДРАТУ
+            // 3. INSTEAD OF A FOREACH OVER THE WHOLE MAP, ITERATE ONLY OVER THE VISIBLE SQUARE
             for (int x = minX; x <= maxX; x++)
             {
                 for (int y = minY; y <= maxY; y++)
                 {
                     var gridPos = new Vector2D<int>(x, y);
 
-                    // Поиск в словаре работает за O(1). 
-                    // Если в этой видимой клетке нет тайла - мгновенно пропускаем
+                    // Dictionary lookup is O(1).
+                    // If this visible cell has no tile, skip it immediately
                     if (!layer.Grid.TryGetValue(gridPos, out string? path) || string.IsNullOrEmpty(path)) 
                         continue;
 
@@ -95,7 +95,7 @@ namespace ef2dg
                     float posY = y * TileSizeInWorld + (sizeInWorld.Y - TileSizeInWorld) / 2f + config.TextureOffset.Y; 
                     Vector2D<float> position = new Vector2D<float>(posX, posY);
 
-                    // МАТЕМАТИКА КАДРОВ АНИМАЦИИ (как мы делали в прошлый раз)
+                    // ANIMATION FRAME MATH
                     float uvWidth = 1.0f / config.FrameCount; 
                     float startUvX = 0f;
 
@@ -113,7 +113,7 @@ namespace ef2dg
             }
         }
         
-        // НОВОЕ: Идеальная математика столкновения AABB (квадрата) и Треугольника!
+        // Exact collision math between an AABB (box) and a triangle
         public bool HasCollision(float left, float right, float top, float bottom)
         {
             float halfSize = TileSizeInWorld / 2f;
@@ -131,7 +131,7 @@ namespace ef2dg
                     for (int x = startX; x <= endX; x++)
                     {
                         var gridPos = new Vector2D<int>(x, y);
-                        // Фикс CS8600: используем string?
+                        // CS8600 fix: use string?
                         if (layer.Grid.TryGetValue(gridPos, out string? path) && !string.IsNullOrEmpty(path) && TileConfigs.TryGetValue(path, out var config))
                         {
                             if (config.CollisionType == TileCollisionType.Solid)
@@ -145,27 +145,27 @@ namespace ef2dg
                                     bottom < tilePosY + tileHeight / 2f && top > tilePosY - tileHeight / 2f)
                                     return true;
                             }
-                            // Математика диагональных стен (идеально для Top-Down)
+                            // Diagonal wall math (ideal for top-down)
                             else if (config.CollisionType == TileCollisionType.SlopeLeft || config.CollisionType == TileCollisionType.SlopeRight)
                             {
                                 bool isLeft = config.CollisionType == TileCollisionType.SlopeLeft;
-                                bool fX = config.FlipX ^ isLeft; // Логический XOR
+                                bool fX = config.FlipX ^ isLeft; // Logical XOR
                                 bool fY = config.FlipY;
 
                                 float tileLeftEdge = (x * TileSizeInWorld) - TileSizeInWorld / 2f;
                                 float tileBottomEdge = (y * TileSizeInWorld) - TileSizeInWorld / 2f;
 
-                                // Нормализуем координаты хитбокса персонажа в пространство тайла (от 0 до 1)
+                                // Normalize the character hitbox coordinates into tile space (0 to 1)
                                 float localLeft = (left - tileLeftEdge) / TileSizeInWorld;
                                 float localRight = (right - tileLeftEdge) / TileSizeInWorld;
                                 float localBottom = (bottom - tileBottomEdge) / TileSizeInWorld;
                                 float localTop = (top - tileBottomEdge) / TileSizeInWorld;
 
-                                // Высчитываем самый "глубокий" угол хитбокса относительно склона
+                                // Find the "deepest" hitbox corner relative to the slope
                                 float effX_max = fX ? (1.0f - localLeft) : localRight;
                                 float effY_min = fY ? (1.0f - localTop) : localBottom;
 
-                                // Если самый глубокий угол пробил диагональ - это столкновение!
+                                // If the deepest corner crossed the diagonal, it is a collision!
                                 if (effY_min < effX_max) return true;
                             }
                         }
@@ -175,8 +175,8 @@ namespace ef2dg
             return false;
         }
 
-        // Добавлен аргумент includeSolid = false
-        // Теперь метод возвращает кортеж: саму высоту (Y) и флажок, является ли этот пол склоном (IsSlope)
+        // Added argument includeSolid = false
+        // The method returns a tuple: the height (Y) and a flag telling whether this floor is a slope (IsSlope)
         public (float Y, bool IsSlope)? GetSlopeFloorY(float leftX, float rightX, float worldY, bool includeSolid = false)
         {
             (float Y, bool IsSlope)? bestFloor = null;
@@ -200,7 +200,7 @@ namespace ef2dg
                         {
                             float currentFloorY = float.MinValue;
                             bool foundFloor = false;
-                            bool isSlope = false; // НОВОЕ: Трекаем тип поверхности
+                            bool isSlope = false; // Track the surface type
 
                             if (config.CollisionType == TileCollisionType.SlopeRight || config.CollisionType == TileCollisionType.SlopeLeft)
                             {
@@ -218,7 +218,7 @@ namespace ef2dg
                                 
                                 currentFloorY = tileBottomEdge + (heightOffset * TileSizeInWorld);
                                 foundFloor = true;
-                                isSlope = true; // Это математический наклон!
+                                isSlope = true; // This is a mathematical slope!
                             }
                             else if (includeSolid && config.CollisionType == TileCollisionType.Solid)
                             {
@@ -228,7 +228,7 @@ namespace ef2dg
                                 {
                                     currentFloorY = topY;
                                     foundFloor = true;
-                                    isSlope = false; // Это плоский квадратный блок!
+                                    isSlope = false; // This is a flat square block!
                                 }
                             }
 
@@ -236,7 +236,7 @@ namespace ef2dg
                             {
                                 if (worldY >= currentFloorY - (TileSizeInWorld * 1.5f) && worldY <= currentFloorY + (TileSizeInWorld * 1.5f))
                                 {
-                                    // Если нашли пол выше, запоминаем его вместе с его типом (склон/не склон)
+                                    // If a higher floor is found, remember it together with its type (slope or not)
                                     if (bestFloor == null || currentFloorY > bestFloor.Value.Y) 
                                     {
                                         bestFloor = (currentFloorY, isSlope);
@@ -252,11 +252,11 @@ namespace ef2dg
 
         public void DrawDebug(SpriteRenderer renderer, Camera camera, Vector4D<float> color)
         {
-            // 1. Вычисляем границы обзора камеры
+            // 1. Compute the camera view bounds
             float halfW = camera.ViewWidth / 2f;
             float halfH = camera.ViewHeight / 2f;
 
-            // Считаем клетки, захватывая парочку запасных по краям
+            // Count cells, grabbing a couple of spare ones at the edges
             int minX = (int)MathF.Floor((camera.Position.X - halfW) / TileSizeInWorld) - 2;
             int maxX = (int)MathF.Ceiling((camera.Position.X + halfW) / TileSizeInWorld) + 2;
             int minY = (int)MathF.Floor((camera.Position.Y - halfH) / TileSizeInWorld) - 2;
@@ -266,14 +266,14 @@ namespace ef2dg
             {
                 if (!layer.HasCollision) continue;
 
-                // 2. Итерируемся ТОЛЬКО по видимой зоне экрана
+                // 2. Iterate ONLY over the visible screen area
                 for (int x = minX; x <= maxX; x++)
                 {
                     for (int y = minY; y <= maxY; y++)
                     {
                         var gridPos = new Vector2D<int>(x, y);
 
-                        // Если тайл есть и у него настроена коллизия - рисуем хитбокс
+                        // If there is a tile with collision configured, draw its hitbox
                         if (layer.Grid.TryGetValue(gridPos, out string? path) && !string.IsNullOrEmpty(path))
                         {
                             if (TileConfigs.TryGetValue(path, out var config) && config.CollisionType != TileCollisionType.None)
@@ -316,7 +316,7 @@ namespace ef2dg
             DrawShape(renderer, camera, posX, posY, size, type, flipX, flipY, color);
         }
 
-        // НОВОЕ: Отрисовка плотного треугольника лесенкой!
+        // Draw a filled triangle as a staircase
         private void DrawShape(SpriteRenderer renderer, Camera camera, float posX, float posY, Vector2D<float> size, TileCollisionType type, bool flipX, bool flipY, Vector4D<float> color)
         {
             if (type == TileCollisionType.Solid)
@@ -334,16 +334,16 @@ namespace ef2dg
                 
                 for(int i = 0; i < steps; i++)
                 {
-                    // Находим локальный X (от 0 до 1)
+                    // Find the local X (0 to 1)
                     float localX = (i + 0.5f) / steps;
                     float effX = fX ? 1.0f - localX : localX;
                     
-                    // Высота конкретного столбика
+                    // Height of this column
                     float h = effX * size.Y;
                     
                     float cx = posX - size.X/2f + i * stepW + stepW/2f;
                     
-                    // Если потолок (FlipY), столбик "свисает" сверху вниз
+                    // For a ceiling (FlipY) the column hangs from top to bottom
                     float cy = fY ? (posY + size.Y/2f - h/2f) : (posY - size.Y/2f + h/2f);
                     
                     renderer.DrawCollisionBox(new Vector2D<float>(cx, cy), new Vector2D<float>(stepW, h), camera, color);

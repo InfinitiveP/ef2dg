@@ -10,13 +10,13 @@ namespace ef2dg
         public Vector3D<float> Front { get; set; } = new Vector3D<float>(0.0f, 0.0f, -1.0f);
         public Vector3D<float> Up { get; set; } = Vector3D<float>.UnitY;
 
-        // НОВОЕ: Свойство масштабирования (по умолчанию 1.0)
+        // Zoom property (1.0 by default)
         public float Zoom { get; set; } = 1.0f;
 
         private float _width;
         private float _height;
         
-        // НОВОЕ: Ширина и высота обзора теперь умножаются на Zoom
+        // View width and height are multiplied by Zoom
         public float AspectRatio => _height == 0f ? 1f : _width / _height;
         public float ViewHeight => 2.0f * Zoom;
         public float ViewWidth => ViewHeight * AspectRatio;
@@ -43,7 +43,7 @@ namespace ef2dg
         {
             float aspectRatio = _width / _height;
             
-            // НОВОЕ: Базовый размер (2.0) умножаем на Zoom
+            // Base size (2.0) multiplied by Zoom
             float orthographicSize = 2.0f * Zoom; 
             
             return Matrix4X4.CreateOrthographic(orthographicSize * aspectRatio, orthographicSize, 0.1f, 100.0f);

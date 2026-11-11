@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace ef2dg
 {
-    // Тёмная тема в цветах VS Code (Dark+)
+    // Dark theme in VS Code colours (Dark+)
     public static class EditorTheme
     {
         public static readonly Vector4 EditorBackground = Rgb(0x1E1E1E);
@@ -19,7 +19,7 @@ namespace ef2dg
             ImGui.StyleColorsDark();
             var style = ImGui.GetStyle();
 
-            // VS Code: прямые углы у панелей и вкладок, лёгкое скругление у полей ввода
+            // VS Code: square corners on panels and tabs, slight rounding on input fields
             style.WindowRounding = 0f;
             style.ChildRounding = 0f;
             style.FrameRounding = 2f;
@@ -43,7 +43,7 @@ namespace ef2dg
             style.ScrollbarSize = 12f;
             style.GrabMinSize = 10f;
             style.WindowTitleAlign = new Vector2(0f, 0.5f);
-            // Без треугольника сворачивания в заголовке окна
+            // No collapse triangle in the window title
             style.WindowMenuButtonPosition = ImGuiDir.None;
 
             var colors = style.Colors;
@@ -73,7 +73,7 @@ namespace ef2dg
             colors[(int)ImGuiCol.SliderGrab] = Rgb(0x0E639C);
             colors[(int)ImGuiCol.SliderGrabActive] = Rgb(0x1177BB);
 
-            // Обычные кнопки — «вторичные» серые, синий только при нажатии
+            // Regular buttons are "secondary" grey, blue only when pressed
             colors[(int)ImGuiCol.Button] = Rgb(0x3A3D41);
             colors[(int)ImGuiCol.ButtonHovered] = Rgb(0x45494E);
             colors[(int)ImGuiCol.ButtonActive] = Rgb(0x0E639C);
@@ -89,7 +89,7 @@ namespace ef2dg
             colors[(int)ImGuiCol.ResizeGripHovered] = Rgb(0x007ACC, 0.6f);
             colors[(int)ImGuiCol.ResizeGripActive] = Rgb(0x007ACC);
 
-            // Вкладки: неактивные темнее панели, активная сливается с содержимым
+            // Tabs: inactive ones are darker than the panel, the active one blends with the content
             colors[(int)ImGuiCol.Tab] = Rgb(0x2D2D2D);
             colors[(int)ImGuiCol.TabHovered] = Rgb(0x323233);
             colors[(int)ImGuiCol.TabActive] = Rgb(0x1E1E1E);

@@ -1,12 +1,12 @@
 namespace ef2dg
 {
-    // Базовый класс окна редактора: заголовок для докинга и флаг видимости для меню View
+    // Base editor window class: a title for docking and a visibility flag for the View menu
     public abstract class EditorWindow
     {
-        // Заголовок = ID окна в imgui.ini и в раскладке докинга, менять его нельзя без сброса раскладки
+        // Title = window ID in imgui.ini and in the docking layout; do not change it without resetting the layout
         public abstract string Title { get; }
 
-        // Поле, а не свойство: передаётся по ref в ImGui.Begin, чтобы крестик закрывал окно
+        // A field, not a property: passed by ref to ImGui.Begin so the cross button closes the window
         public bool IsOpen = true;
 
         public abstract void Draw(EditorContext ctx, EditorState state);

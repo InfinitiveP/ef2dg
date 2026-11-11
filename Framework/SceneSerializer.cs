@@ -40,7 +40,7 @@ namespace ef2dg
         public List<TileLayerData> TileLayers { get; set; } = new();
         public Dictionary<string, float[]>? TextureScales { get; set; } 
         public Dictionary<string, TileSettingsData> TileConfigs { get; set; } = new();
-        // null у уровней, сохранённых до появления освещения по сценам
+        // null for levels saved before per-scene lighting existed
         public SceneLighting? Lighting { get; set; }
     }
 
@@ -77,7 +77,7 @@ namespace ef2dg
 
     public static class SceneSerializer
     {
-        // IncludeFields нужен для System.Numerics.Vector3 в SceneLighting (X, Y, Z — поля, а не свойства)
+        // IncludeFields is needed for System.Numerics.Vector3 in SceneLighting (X, Y, Z are fields, not properties)
         private static readonly JsonSerializerOptions SaveOptions = new JsonSerializerOptions { WriteIndented = true, IncludeFields = true };
         private static readonly JsonSerializerOptions LoadOptions = new JsonSerializerOptions { IncludeFields = true };
 
