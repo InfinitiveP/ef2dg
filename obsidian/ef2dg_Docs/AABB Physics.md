@@ -1,5 +1,7 @@
 # AABB Physics
 
+🌐 **Русский** · [English](../ef2dg_Docs_en/AABB%20Physics.md)
+
 AABB (axis-aligned bounding box) — прямоугольник со сторонами, параллельными осям. В `ef2dg` размеры и смещение хитбокса задаются `HitboxSize`/`HitboxOffset` у [PhysicsBody](03_Modules/PhysicsBody.md) и `Size`/`Offset` у `BoxCollider`.
 
 Два прямоугольника пересекаются, когда их интервалы пересекаются одновременно по X и Y. Для твёрдого тайла карта проверяет: `left < tileRight`, `right > tileLeft`, `bottom < tileTop`, `top > tileBottom`.

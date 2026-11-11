@@ -1,5 +1,7 @@
 # SpriteRenderer
 
+🌐 **Русский** · [English](../../ef2dg_Docs_en/01_Core_Engine/SpriteRenderer.md)
+
 `SpriteRenderer` принимает прежние вызовы `Draw`, `DrawColored` и `DrawCollisionBox`, но обычные спрайты больше не отправляются в OpenGL по одному. CPU рассчитывает итоговые мировые координаты, UV, RGBA и texture slot четырёх вершин, после чего накапливает их в динамическом batch.
 
 ## Основной sprite batch
@@ -24,7 +26,7 @@
 - `Engine` меняет framebuffer либо blend state;
 - завершён render frame.
 
-`RenderSceneToFramebuffer` явно завершает batch перед световым framebuffer и после источников света. `DrawFramebuffer` и `DrawColorOverlay` немедленно вызывают `Flush`, поскольку являются отдельными полноэкранными проходами.
+`RenderSceneToFramebuffer` явно завершает batch перед применением освещения. `DrawFramebuffer` и `DrawColorOverlay` немедленно вызывают `Flush`, поскольку являются отдельными полноэкранными проходами.
 
 ## Одноцветный UI batch
 

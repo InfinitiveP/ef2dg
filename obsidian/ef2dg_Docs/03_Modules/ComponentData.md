@@ -1,5 +1,7 @@
 # ComponentData
 
+🌐 **Русский** · [English](../../ef2dg_Docs_en/03_Modules/ComponentData.md)
+
 `ComponentData` — DTO одного компонента. `TypeName` определяет класс по имени в пространстве `ef2dg`; простые публичные свойства разложены по словарям `FloatValues`, `BoolValues`, `IntValues`, `StringValues` и `VectorValues`.
 
 Загрузка создаёт экземпляр через reflection и присваивает значения свойствам с публичным setter. Свойства других типов, приватные поля и поля только для чтения не сохраняются автоматически.

@@ -1,5 +1,7 @@
 # SceneSerializer
 
+🌐 **Русский** · [English](../../ef2dg_Docs_en/03_Modules/SceneSerializer.md)
+
 `SceneSerializer.Save(scene, filePath)` создаёт [LevelData](LevelData.md) и записывает форматированный JSON. `Load(scene, filePath, resources)` читает JSON и возвращает `false`, если файл отсутствует, пуст или не разбирается.
 
 При загрузке очищаются сущности и данные карты, восстанавливаются слои и конфигурация тайлов, затем создаются компоненты. Для `PhysicsBody` назначается текущая карта; для `SpriteComponent` запускается `Idle` либо первая анимация; игрок `GameScene` определяется по `PlayerController`.

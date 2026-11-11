@@ -2,9 +2,11 @@
 
 # ef2dg
 
-**Самописный 2D-движок и визуальный редактор на C#**
+**English** · [Русский](README.ru.md)
 
-Компонентная архитектура · JSON-сцены · тайлмапы с физикой · освещение с bloom · встроенный редактор на Dear ImGui
+**A custom 2D game engine and visual editor written in C#**
+
+Component architecture · JSON scenes · tilemaps with physics · lighting with bloom · built-in Dear ImGui editor
 
 ![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)
 ![C#](https://img.shields.io/badge/C%23-13-239120?logo=csharp&logoColor=white)
@@ -13,37 +15,37 @@
 ![Dear ImGui](https://img.shields.io/badge/Dear%20ImGui-editor-1F1F1F)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 
-[Возможности](#возможности) · [Быстрый старт](#быстрый-старт) · [Архитектура](#архитектура) · [Редактор](#редактор) · [Документация](#документация)
+[Features](#features) · [Quick start](#quick-start) · [Architecture](#architecture) · [Editor](#editor) · [Documentation](#documentation)
 
 </div>
 
 ---
 
-## О проекте
+## About
 
-`ef2dg` — движок для 2D-игр с видом сбоку и сверху. Он создаёт окно OpenGL 3.3, ведёт игровой цикл с фиксированным шагом физики и сразу открывает редактор: сцену можно собрать мышью, настроить компоненты в инспекторе, нарисовать карту тайлами, расставить свет и запустить игру кнопкой **Play** в том же окне.
+`ef2dg` is an engine for side-view and top-down 2D games. It opens an OpenGL 3.3 window, runs a game loop with fixed-step physics and starts straight into the editor: build a scene with the mouse, tweak components in the Inspector, paint the map with tiles, place lights and hit **Play** — all in the same window.
 
-Поведение объектов задаётся компонентами. Новый компонент — это обычный C#-класс: после сборки он сам появляется в меню **Add Component**, а его публичные свойства — в инспекторе и в JSON уровня.
+Object behaviour is defined by components. A new component is a plain C# class: after a build it shows up in the **Add Component** menu by itself, and its public properties appear in the Inspector and in the level JSON.
 
-## Возможности
+## Features
 
-| Подсистема | Что умеет |
+| Subsystem | What it does |
 |---|---|
-| **Сцены и компоненты** | `Scene` → `GameObject` → `Component`; стек сцен `ChangeScene` / `PushScene` / `PopScene`; отсечение обновления вне камеры и флаг `AlwaysActive` |
-| **Сериализация** | JSON-уровни через reflection: `float`, `bool`, `int`, `string`, `Vector2D`, `Vector4D`, `TransitionSettings`; тайлы, их настройки и освещение сцены; атрибут `[SceneTransient]` для runtime-полей |
-| **Рендер** | динамический sprite batch до 2048 спрайтов и 16 текстур за draw call, отдельный batch одноцветного UI, отладочная геометрия; счётчики `Draws`/`Quads` |
-| **Освещение** | своё у каждой сцены: HDR-карта света, ядро свечения, bloom, экспозиция, контраст, насыщенность, тонирование, виньетка; источники с мерцанием и пульсацией; пресеты локаций |
-| **Тайлмап** | слои `Background` / `Ground` / `Foreground`, коллизии `Solid` и склоны, масштаб, смещение, отражение и анимация тайлов |
-| **Физика** | кинематический `PhysicsBody` с AABB: платформер с гравитацией и склонами или вид сверху; триггеры `OnTriggerEnter/Stay/Exit` |
-| **Анимация** | `SpriteComponent` со state machine: параметры, условия переходов, `ExitTime`, звуки на кадрах |
-| **Аудио** | OpenAL: 16 каналов эффектов с позиционированием и отдельная музыка (PCM WAV) |
-| **Переходы** | `Instant`, `Fade`, `CrossFade`, `SlideLeft/Right/Up/Down` для смены сцен, оверлеев и телепортов |
-| **Ввод** | логические действия с переназначением в `bindings.json`; координаты мыши для игрового UI внутри окна сцены |
-| **Игровой UI** | объекты с `IsUI` рисуются экранной камерой поверх мира и освещения |
+| **Scenes and components** | `Scene` → `GameObject` → `Component`; a scene stack with `ChangeScene` / `PushScene` / `PopScene`; update culling outside the camera and the `AlwaysActive` flag |
+| **Serialization** | reflection-based JSON levels: `float`, `bool`, `int`, `string`, `Vector2D`, `Vector4D`, `TransitionSettings`; tiles, their settings and scene lighting; the `[SceneTransient]` attribute for runtime-only members |
+| **Rendering** | a dynamic sprite batch of up to 2048 sprites and 16 textures per draw call, a separate solid-colour UI batch, debug geometry; `Draws`/`Quads` counters |
+| **Lighting** | per scene: HDR light map, glowing cores, bloom, exposure, contrast, saturation, tint, vignette; flickering and pulsing light sources; location presets |
+| **Tilemap** | `Background` / `Ground` / `Foreground` layers, `Solid` and slope collisions, tile scale, offset, flipping and animation |
+| **Physics** | kinematic AABB `PhysicsBody`: a platformer with gravity and slopes or a top-down view; `OnTriggerEnter/Stay/Exit` triggers |
+| **Animation** | `SpriteComponent` with a state machine: parameters, transition conditions, `ExitTime`, per-frame sounds |
+| **Audio** | OpenAL: 16 positional effect channels plus a separate music source (PCM WAV) |
+| **Transitions** | `Instant`, `Fade`, `CrossFade`, `SlideLeft/Right/Up/Down` for scene changes, overlays and teleports |
+| **Input** | rebindable logical actions in `bindings.json`; mouse coordinates for in-game UI inside the scene view |
+| **In-game UI** | `IsUI` objects are drawn with a screen camera on top of the world and the lighting |
 
-## Быстрый старт
+## Quick start
 
-**Требования:** .NET SDK 10, видеодрайвер с OpenGL 3.3, аудиоустройство для OpenAL. Проверено на Windows.
+**Requirements:** .NET SDK 10, a GPU driver with OpenGL 3.3, an audio device for OpenAL. Tested on Windows.
 
 ```powershell
 git clone https://github.com/InfinitiveP/ef2dg.git
@@ -51,25 +53,25 @@ cd ef2dg
 dotnet run
 ```
 
-Запускайте из каталога проекта: конфигурация, уровни, шейдеры и `assets/` читаются относительными путями.
+Run from the project folder: configuration, levels, shaders and `assets/` are read through relative paths.
 
-Первые шаги в редакторе:
+First steps in the editor:
 
-1. `File → New Scene` или `File → Open...` (`Ctrl+O`).
-2. `Ctrl+Shift+N` — новый объект; в **Inspector** нажмите **Add Component**.
-3. В **Tile Palette** выберите тайл и рисуйте в **Scene View**.
-4. Окно **Lighting** — пресет освещения и **+ Добавить источник света**.
-5. `Ctrl+S` — сохранить, `Ctrl+P` — Play / Stop.
+1. `File → New Scene` or `File → Open...` (`Ctrl+O`).
+2. `Ctrl+Shift+N` creates an object; press **Add Component** in the **Inspector**.
+3. Pick a tile in **Tile Palette** and paint in the **Scene View**.
+4. In the **Lighting** window choose a preset and press **+ Добавить источник света** (add light source).
+5. `Ctrl+S` saves, `Ctrl+P` toggles Play / Stop.
 
 > [!WARNING]
-> Play Mode работает на той же сцене, что и редактор, и не откатывает её после **Stop**. Сохраняйте уровень до запуска и не сохраняйте его во время игры — иначе в JSON попадёт runtime-состояние.
+> Play Mode runs on the same scene as the editor and does not roll it back after **Stop**. Save the level before playing and never save it during play — otherwise runtime state ends up in the JSON.
 
-## Архитектура
+## Architecture
 
 ```mermaid
 flowchart TB
     Program --> Engine
-    Engine --> Stack["Стек сцен"]
+    Engine --> Stack["Scene stack"]
     Engine --> Renderer["SpriteRenderer"]
     Engine --> Lighting["LightingRenderer"]
     Engine --> Resources["ResourceManager"]
@@ -82,32 +84,32 @@ flowchart TB
     Scene <--> Serializer["SceneSerializer ⇄ JSON"]
 ```
 
-### Кадр
+### Frame
 
 ```mermaid
 flowchart LR
-    A["FixedUpdate<br/>шаг 1/60 с"] --> B["Update"]
-    B --> C["DrawWorld<br/>тайлы и объекты"]
-    C --> D["Освещение<br/>свет · bloom · цвет"]
-    D --> E["DrawEditorOverlay<br/>гизмо и хитбоксы"]
-    E --> F["DrawUI<br/>объекты IsUI"]
-    F --> G["Переход<br/>Fade / Slide"]
-    G --> H["Scene View<br/>в редакторе"]
+    A["FixedUpdate<br/>1/60 s step"] --> B["Update"]
+    B --> C["DrawWorld<br/>tiles and objects"]
+    C --> D["Lighting<br/>light · bloom · colour"]
+    D --> E["DrawEditorOverlay<br/>gizmos and hitboxes"]
+    E --> F["DrawUI<br/>IsUI objects"]
+    F --> G["Transition<br/>Fade / Slide"]
+    G --> H["Scene View<br/>in the editor"]
 ```
 
-Физика идёт с фиксированным шагом, накопитель ограничен 0,25 с. Свет ложится только на мир: гизмо редактора и игровой HUD рисуются поверх него. Смена сцен откладывается до конца кадра.
+Physics runs at a fixed step with the accumulator capped at 0.25 s. Light affects only the world: editor gizmos and the game HUD are drawn on top of it. Scene changes are deferred to the end of the frame.
 
-### Свой компонент
+### Your own component
 
 ```csharp
 namespace ef2dg
 {
     public class HealthComponent : Component
     {
-        public int MaxHealth { get; set; } = 100;     // видно в Inspector и сохраняется в JSON
+        public int MaxHealth { get; set; } = 100;     // visible in the Inspector and saved to JSON
         public int CurrentHealth { get; set; } = 100;
 
-        public HealthComponent() { }                  // нужен редактору и загрузчику
+        public HealthComponent() { }                  // required by the editor and the loader
 
         public override void Update(float deltaTime)
         {
@@ -117,70 +119,71 @@ namespace ef2dg
 }
 ```
 
-Компонент должен лежать в namespace `ef2dg` и иметь публичный конструктор без параметров. `Start()` при загрузке вызывается **до** восстановления свойств из JSON — подробности в [руководстве по компонентам](obsidian/ef2dg_Docs/05_Guides/Разработка%20компонентов.md).
+A component must live in the `ef2dg` namespace and have a public parameterless constructor. On load, `Start()` is called **before** properties are restored from JSON — see the [component guide](obsidian/ef2dg_Docs_en/05_Guides/Component%20Development.md) for details.
 
-## Редактор
+## Editor
 
-| Окно | Назначение |
+| Window | Purpose |
 |---|---|
-| **Scene View** | вкладки сцен, выбор и перетаскивание объектов, рисование тайлов, zoom колесом |
-| **Hierarchy** | список объектов, порядок отрисовки, создание и удаление |
-| **Inspector** | transform, `IsUI`, `AlwaysActive` и свойства компонентов через reflection |
-| **Tile Palette** | слои, кисть, коллизии и анимация тайлов |
-| **Lighting** | освещение сцены, пресеты, добавление источников |
-| **Asset Browser** | ресурсы проекта, предпросмотр, импорт перетаскиванием файлов |
-| **Console** | вывод `Console.WriteLine` с подсветкой ошибок |
-| **Project Settings** | масштаб камеры, цвет фона, привязки клавиш |
+| **Scene View** | scene tabs, selecting and dragging objects, tile painting, wheel zoom |
+| **Hierarchy** | object list, draw order, creating and deleting |
+| **Inspector** | transform, `IsUI`, `AlwaysActive` and component properties through reflection |
+| **Tile Palette** | layers, brush, tile collisions and animation |
+| **Lighting** | scene lighting, presets, adding light sources |
+| **Asset Browser** | project resources, previews, import by dropping files |
+| **Console** | `Console.WriteLine` output with error highlighting |
+| **Project Settings** | camera zoom, background colour, key bindings |
 
-| Клавиши | Действие |
+| Keys | Action |
 |---|---|
-| `Ctrl+S` / `Ctrl+Shift+S` / `Ctrl+O` | сохранить / сохранить как / открыть сцену |
-| `Ctrl+Z` / `Ctrl+Y` | отмена / повтор (рисование тайлов) |
+| `Ctrl+S` / `Ctrl+Shift+S` / `Ctrl+O` | save / save as / open a scene |
+| `Ctrl+Z` / `Ctrl+Y` | undo / redo (tile painting) |
 | `Ctrl+P` | Play / Stop |
-| `Ctrl+Shift+N` | новый объект |
-| `W` `A` `S` `D` | камера редактора |
-| `F1`–`F4` | хитбоксы игрока, объектов, карты и зоны атак |
-| `F5` | монитор производительности: FPS, frame time, `Draws`, `Quads` |
+| `Ctrl+Shift+N` | new object |
+| `W` `A` `S` `D` | editor camera |
+| `F1`–`F4` | player, object and map hitboxes, attack zones |
+| `F5` | performance monitor: FPS, frame time, `Draws`, `Quads` |
 
-## Структура
+## Project layout
 
 ```text
-Core/         движок, игровой цикл, ввод, конфигурация, переходы
+Core/         engine, game loop, input, configuration, transitions
 Framework/    Scene, GameObject, Component, SceneSerializer, Tilemap, SceneLighting
-Rendering/    камера, шейдеры, текстуры, framebuffer, SpriteRenderer, LightingRenderer
-Components/   SpriteComponent, PhysicsBody, BoxCollider, LightComponent, AudioSource, частицы, кнопки
-Editor/       окна редактора Dear ImGui
-Audio/        OpenAL-аудио
+Rendering/    camera, shaders, textures, framebuffers, SpriteRenderer, LightingRenderer
+Components/   SpriteComponent, PhysicsBody, BoxCollider, LightComponent, AudioSource, particles, buttons
+Editor/       Dear ImGui editor windows
+Audio/        OpenAL audio
 Scenes/       UIScene
-Game/         пример: GameScene, PlayerController, EnemyAIComponent, триггеры
-Shaders/      освещение и постобработка
-obsidian/     техническая вики (Obsidian vault)
+Game/         example: GameScene, PlayerController, EnemyAIComponent, triggers
+Shaders/      lighting and post-processing
+obsidian/     technical wiki: ef2dg_Docs_en (English) and ef2dg_Docs (Russian)
 ```
 
-## Документация
+## Documentation
 
-Полная вики лежит в [`obsidian/ef2dg_Docs`](obsidian/ef2dg_Docs/00_Dashboard/00_Main.md) — её можно читать прямо на GitHub или открыть папку как vault в [Obsidian](https://obsidian.md).
+The full wiki is available in English in [`obsidian/ef2dg_Docs_en`](obsidian/ef2dg_Docs_en/00_Dashboard/00_Main.md) and in Russian in [`obsidian/ef2dg_Docs`](obsidian/ef2dg_Docs/00_Dashboard/00_Main.md). Read it right here on GitHub or open the folder as a vault in [Obsidian](https://obsidian.md). Every note starts with a link to the same note in the other language.
 
-- [Начало работы](obsidian/ef2dg_Docs/05_Guides/Начало%20работы.md)
-- [Полное руководство по редактору](obsidian/ef2dg_Docs/04_Editor_Tools/Полное%20руководство%20по%20редактору.md)
-- [Разработка компонентов](obsidian/ef2dg_Docs/05_Guides/Разработка%20компонентов.md)
-- [Формат уровня и сериализация](obsidian/ef2dg_Docs/03_Modules/Формат%20уровня%20и%20сериализация.md)
-- [Освещение](obsidian/ef2dg_Docs/05_Guides/Освещение.md)
-- [Переходы между локациями](obsidian/ef2dg_Docs/05_Guides/Переходы%20между%20локациями.md)
-- [Ограничения и диагностика](obsidian/ef2dg_Docs/05_Guides/Ограничения%20и%20диагностика.md)
+- [Getting Started](obsidian/ef2dg_Docs_en/05_Guides/Getting%20Started.md)
+- [Complete Editor Guide](obsidian/ef2dg_Docs_en/04_Editor_Tools/Complete%20Editor%20Guide.md)
+- [Component Development](obsidian/ef2dg_Docs_en/05_Guides/Component%20Development.md)
+- [Level Format and Serialization](obsidian/ef2dg_Docs_en/03_Modules/Level%20Format%20and%20Serialization.md)
+- [Lighting](obsidian/ef2dg_Docs_en/05_Guides/Lighting.md)
+- [Scene Transitions](obsidian/ef2dg_Docs_en/05_Guides/Scene%20Transitions.md)
+- [Limitations and Diagnostics](obsidian/ef2dg_Docs_en/05_Guides/Limitations%20and%20Diagnostics.md)
 
-## Известные ограничения
+## Known limitations
 
-- Play Mode не изолирован от редактора; Undo/Redo — только для тайлов.
-- Аудио декодирует только PCM WAV.
-- `BoxCollider` без `IsTrigger` не останавливает `PhysicsBody`: твёрдые препятствия задаёт тайлмап.
-- Тени не рассчитываются, свет проходит сквозь стены.
-- Ссылки между объектами и приватное состояние компонентов в JSON не сохраняются.
+- Play Mode is not isolated from the editor; Undo/Redo covers tiles only.
+- Audio decodes PCM WAV only.
+- A `BoxCollider` without `IsTrigger` does not stop a `PhysicsBody`: solid obstacles come from the tilemap.
+- No shadows: light passes through walls.
+- References between objects and private component state are not saved to JSON.
+- Source code comments and some Lighting window labels are still in Russian.
 
-## Зависимости
+## Dependencies
 
-[Silk.NET](https://github.com/dotnet/Silk.NET) (OpenGL, GLFW, Input, OpenAL), [ImGui.NET](https://github.com/ImGuiNET/ImGui.NET), [StbImageSharp](https://github.com/StbSharp/StbImageSharp), [Newtonsoft.Json](https://www.newtonsoft.com/json). Резервный шрифт редактора — [Roboto](https://fonts.google.com/specimen/Roboto).
+[Silk.NET](https://github.com/dotnet/Silk.NET) (OpenGL, GLFW, Input, OpenAL), [ImGui.NET](https://github.com/ImGuiNET/ImGui.NET), [StbImageSharp](https://github.com/StbSharp/StbImageSharp), [Newtonsoft.Json](https://www.newtonsoft.com/json). The editor's fallback font is [Roboto](https://fonts.google.com/specimen/Roboto).
 
-## Лицензия
+## License
 
-Код движка распространяется по лицензии [MIT](LICENSE). Тестовые изображения в `assets/` — простые заглушки, созданные для движка, и распространяются вместе с кодом. Шрифт Roboto © The Roboto Project Authors распространяется по [SIL Open Font License 1.1](https://openfontlicense.org).
+The engine code is released under the [MIT License](LICENSE). The test images in `assets/` are simple placeholders made for the engine and are distributed with the code. The Roboto font © The Roboto Project Authors is licensed under the [SIL Open Font License 1.1](https://openfontlicense.org).

@@ -1,5 +1,7 @@
 # DebugSettings
 
+🌐 **Русский** · [English](../../ef2dg_Docs_en/01_Core_Engine/DebugSettings.md)
+
 Статический набор флагов диагностики. `Engine` меняет их клавишами `F1`–`F5`, а `GameScene` использует для вывода хитбоксов, зон атаки и сетки карты.
 
 - `F1` / `ShowPlayerHitbox` — хитбокс игрока.

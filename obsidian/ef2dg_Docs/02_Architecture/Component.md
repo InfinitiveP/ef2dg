@@ -1,12 +1,14 @@
 # Component
 
+🌐 **Русский** · [English](../../ef2dg_Docs_en/02_Architecture/Component.md)
+
 `Component` — базовый абстрактный класс поведения. После добавления к [GameObject](GameObject.md) свойство `Owner` указывает на владельца. Для удобства доступны защищённые `Position`, `Sprite` и `Physics`.
 
 ## Жизненный цикл
 
 `AddComponent` и `AddComponentDynamic` назначают `Owner` и сразу вызывают `Start`. Затем сцена вызывает `FixedUpdate`, `Update` и `Draw` через объект-владельца. Триггерная физика вызывает `OnTriggerEnter`, `OnTriggerStay` и `OnTriggerExit`.
 
-Публичные изменяемые свойства типов `float`, `bool`, `int`, `string` и `Vector2D<float>` сериализуются [SceneSerializer](../03_Modules/SceneSerializer.md). Сложные или только вычисляемые поля требуют отдельной поддержки сериализации.
+Публичные изменяемые свойства типов `float`, `bool`, `int`, `string`, `Vector2D<float>` и `Vector4D<float>` сериализуются [SceneSerializer](../03_Modules/SceneSerializer.md). Сложные или только вычисляемые поля требуют отдельной поддержки сериализации.
 
 ## Важные особенности
 

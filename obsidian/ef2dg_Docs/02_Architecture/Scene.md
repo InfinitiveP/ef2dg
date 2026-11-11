@@ -1,5 +1,7 @@
 # Scene
 
+🌐 **Русский** · [English](../../ef2dg_Docs_en/02_Architecture/Scene.md)
+
 `Scene` — абстрактный контейнер уровня. Он содержит `Entities`, `Map`, `InstanceName`, `FilePath`, `ActiveCamera`, `SimulationPadding` и настройки освещения `Lighting` ([Освещение](../05_Guides/Освещение.md)). Наследник обязан реализовать `Load(ResourceManager, IInputContext)`.
 
 `FixedUpdate` и `Update` вызывают одноимённые методы сущностей только в зоне камеры с запасом `SimulationPadding`, если у сущности не включён `AlwaysActive`.

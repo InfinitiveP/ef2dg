@@ -1,13 +1,17 @@
 # Редактор
 
+🌐 **Русский** · [English](../../ef2dg_Docs_en/04_Editor_Tools/EditorUI.md)
+
 `EditorUI` объединяет окна Dear ImGui и общий `EditorState`.
 
-- `ToolbarWindow` запускает/останавливает Play Mode, выполняет Undo/Redo, сохраняет и загружает JSON-уровни.
+- `MainMenuBar` — меню `File`, `Edit`, `View`, `Run`, `Help`, кнопка Play/Stop и горячие клавиши.
+- `ToolbarWindow` — те же команды Play/Stop, Undo/Redo, сохранения и загрузки отдельным окном (по умолчанию скрыто).
 - `HierarchyWindow` показывает сущности, создаёт новые и позволяет выбрать активную.
 - `SceneViewWindow` показывает framebuffer, обрабатывает выбор, перетаскивание, покраску тайлов и кнопки сцены.
 - `InspectorWindow` редактирует transform и публичные простые свойства компонентов через reflection.
 - `TilemapEditorWindow` управляет слоями, настройками тайлов и типом коллизии.
 - `AssetBrowserWindow` просматривает `assets`, выбирает кисть тайлов и проигрывает предпросмотр аудио.
+- `LightingWindow` настраивает освещение сцены и добавляет источники света.
 - `ConsoleWindow` показывает перехваченный `Console.WriteLine`; `ProjectSettingsWindow` сохраняет `project_config.json`.
 
 Сохранение уровня выполняется через [SceneSerializer](../03_Modules/SceneSerializer.md). Загрузка JSON создаёт или переиспользует вкладку по `InstanceName`; она не является hot reload и не должна так называться.

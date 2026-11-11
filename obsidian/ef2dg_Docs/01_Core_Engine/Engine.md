@@ -1,5 +1,7 @@
 # Engine
 
+🌐 **Русский** · [English](../../ef2dg_Docs_en/01_Core_Engine/Engine.md)
+
 `Engine` — точка входа рантайма. `Program.Main` создаёт экземпляр и вызывает `Run()`.
 
 ## Инициализация
@@ -8,7 +10,7 @@
 
 ## Игровой цикл
 
-`OnUpdate` обрабатывает `Esc`, режим Play/Edit, камеру редактора и FPS. В Play Mode активная сцена получает `FixedUpdate` с шагом `1/60` секунды, затем `Update`; накопитель ограничен `0,25` секунды. В Edit Mode физика и игровая логика не обновляются.
+`OnUpdate` обрабатывает режим Play/Edit, камеру редактора и FPS. `Escape` движок не перехватывает: в Play Mode клавиша свободна для игры, выход из редактора — `File → Exit`. В Play Mode активная сцена получает `FixedUpdate` с шагом `1/60` секунды, затем `Update`; накопитель ограничен `0,25` секунды. В Edit Mode физика и игровая логика не обновляются.
 
 `OnRender` открывает frame статистики [SpriteRenderer](SpriteRenderer.md), рисует стек сцен в отдельный scene framebuffer. Каждая сцена рисуется по фазам `DrawWorld` → освещение `LightingRenderer` (если оно включено у сцены) → `DrawEditorOverlay` → `DrawUI`, поэтому HUD не затемняется (см. [Освещение](../05_Guides/Освещение.md)). Перед каждой сменой framebuffer или blend state накопленный sprite batch обязательно сбрасывается. После этого кадр компонуется в итоговый framebuffer с учётом активного [перехода](../05_Guides/Переходы%20между%20локациями.md) и показывается в [редакторе](../04_Editor_Tools/EditorUI.md) через ImGui. Отдельный snapshot framebuffer хранит старый кадр для `CrossFade` и `Slide`.
 

@@ -1,5 +1,7 @@
 # Shader
 
+🌐 **Русский** · [English](../../ef2dg_Docs_en/01_Core_Engine/Shader.md)
+
 `Shader` загружает исходники GLSL из файлов, компилирует vertex- и fragment-шейдеры и линкует программу OpenGL. Ошибки компиляции или линковки превращаются в исключение с текстом драйвера.
 
 Методы `Use`, `GetUniformLocation`, `SetUniform(Matrix4X4)` и `SetUniform(Vector2D)` применяются [SpriteRenderer](SpriteRenderer.md). Основные файлы — `shader.vert` и `shader.frag`; контуры отладки рисует пара `debug.vert` и `debug.frag`.
