@@ -1,0 +1,24 @@
+# Сборка .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.lscache
+
+# Резервные копии
+*.backup-*
+*.bak
+
+# Состояние интерфейса Obsidian
+**/.obsidian/workspace.json
+**/.obsidian/workspace-mobile.json
+.trash/
+
+# Пользовательские пресеты освещения
+lighting_presets.json
+
+# Системный мусор
+.DS_Store
+Thumbs.db
+desktop.ini

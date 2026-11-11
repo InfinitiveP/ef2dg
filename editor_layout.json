@@ -1,0 +1,14 @@
+{
+  "LayoutVersion": 1,
+  "OpenWindows": {
+    "Hierarchy": true,
+    "Scene View": true,
+    "Inspector": true,
+    "Lighting": true,
+    "Asset Browser": true,
+    "Console (Terminal)": true,
+    "Tile Palette": true,
+    "Project Settings": true,
+    "Toolbar": false
+  }
+}
