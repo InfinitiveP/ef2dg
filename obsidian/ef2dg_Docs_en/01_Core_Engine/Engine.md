@@ -12,6 +12,8 @@
 
 `OnUpdate` handles Play/Edit mode, the editor camera and FPS. The engine does not intercept `Escape`: in Play Mode the key is free for the game, and the editor is closed with `File → Exit`. In Play Mode the active scene receives `FixedUpdate` with a step of `1/60` s, then `Update`; the accumulator is capped at `0.25` s. In Edit Mode physics and game logic are not updated.
 
+Before `ImGuiController.Update` the engine itself submits the modifier state (`ImGuiMod_Ctrl`, `Shift`, `Alt`, `Super`) to ImGui through `io.AddKeyEvent`: the Silk.NET 2.23 controller forwards only the keys themselves, while ImGui 1.90 derives `io.KeyCtrl` from these events alone. Without it the editor shortcuts `Ctrl+O`, `Ctrl+S`, `Ctrl+Shift+S`, `Ctrl+P` and `Ctrl+A` selection in text fields did not work. `File → Exit` only sets a flag; the window closes at the end of `OnRender`, after `ImGuiController.Render()`. Closing it while the menu was being drawn disposed ImGui inside `BeginMenu`/`EndMenu` and crashed the process.
+
 `OnRender` opens a [SpriteRenderer](SpriteRenderer.md) statistics frame and draws the scene stack into a separate scene framebuffer. Each scene is drawn in phases `DrawWorld` → `LightingRenderer` lighting (if the scene has it enabled) → `DrawEditorOverlay` → `DrawUI`, so the HUD is never darkened (see [Lighting](../05_Guides/Lighting.md)). The accumulated sprite batch is always flushed before any framebuffer or blend state change. The frame is then composed into the final framebuffer together with the active [transition](../05_Guides/Scene%20Transitions.md) and shown in the [editor](../04_Editor_Tools/EditorUI.md) through ImGui. A separate snapshot framebuffer keeps the previous frame for `CrossFade` and `Slide`.
 
 ## Scenes

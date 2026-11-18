@@ -12,6 +12,8 @@
 
 `OnUpdate` обрабатывает режим Play/Edit, камеру редактора и FPS. `Escape` движок не перехватывает: в Play Mode клавиша свободна для игры, выход из редактора — `File → Exit`. В Play Mode активная сцена получает `FixedUpdate` с шагом `1/60` секунды, затем `Update`; накопитель ограничен `0,25` секунды. В Edit Mode физика и игровая логика не обновляются.
 
+Перед `ImGuiController.Update` движок сам передаёт в ImGui состояние модификаторов (`ImGuiMod_Ctrl`, `Shift`, `Alt`, `Super`) через `io.AddKeyEvent`: контроллер Silk.NET 2.23 отправляет только сами клавиши, а ImGui 1.90 вычисляет `io.KeyCtrl` лишь по этим событиям. Без этого не работали сочетания редактора `Ctrl+O`, `Ctrl+S`, `Ctrl+Shift+S`, `Ctrl+P` и выделение `Ctrl+A` в полях ввода. `File → Exit` только ставит флаг, а окно закрывается в конце `OnRender`, после `ImGuiController.Render()`: закрытие посреди отрисовки меню освобождало ImGui внутри `BeginMenu`/`EndMenu` и роняло процесс.
+
 `OnRender` открывает frame статистики [SpriteRenderer](SpriteRenderer.md), рисует стек сцен в отдельный scene framebuffer. Каждая сцена рисуется по фазам `DrawWorld` → освещение `LightingRenderer` (если оно включено у сцены) → `DrawEditorOverlay` → `DrawUI`, поэтому HUD не затемняется (см. [Освещение](../05_Guides/Освещение.md)). Перед каждой сменой framebuffer или blend state накопленный sprite batch обязательно сбрасывается. После этого кадр компонуется в итоговый framebuffer с учётом активного [перехода](../05_Guides/Переходы%20между%20локациями.md) и показывается в [редакторе](../04_Editor_Tools/EditorUI.md) через ImGui. Отдельный snapshot framebuffer хранит старый кадр для `CrossFade` и `Slide`.
 
 ## Сцены

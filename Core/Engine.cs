@@ -25,6 +25,14 @@ namespace ef2dg
         private ImGuiController _imGuiController = null!;
         private EditorUI _editorUI = new EditorUI();
         private bool _wasPlayMode = false;
+        // File -> Exit is deferred to the end of the frame: closing the window mid-frame disposes ImGui inside BeginMenu/EndMenu
+        private bool _exitRequested;
+
+        // ImGuiMod_* key codes (1 << 12 ...). ImGui.NET 1.90 has no named members for them.
+        private const ImGuiKey ImGuiModCtrl = (ImGuiKey)(1 << 12);
+        private const ImGuiKey ImGuiModShift = (ImGuiKey)(1 << 13);
+        private const ImGuiKey ImGuiModAlt = (ImGuiKey)(1 << 14);
+        private const ImGuiKey ImGuiModSuper = (ImGuiKey)(1 << 15);
         private Framebuffer _framebuffer = null!;
         private Framebuffer _sceneFramebuffer = null!;
         private Framebuffer _transitionSnapshot = null!;
@@ -404,6 +412,7 @@ namespace ef2dg
 
             _wasPlayMode = _editorUI.IsPlayMode;
             DebugSettings.IsEditorMode = !_editorUI.IsPlayMode;
+            SubmitImGuiModifiers();
             _imGuiController.Update((float)deltaTime);
             _editorUI.UpdateRuntimePointer(_camera);
 
@@ -491,6 +500,20 @@ namespace ef2dg
             }
         }
 
+        // Silk.NET's ImGui controller forwards regular keys but not modifier state. ImGui 1.90 derives
+        // io.KeyCtrl/KeyShift/KeyAlt only from ImGuiMod_* key events, so without them every Ctrl shortcut
+        // (Ctrl+S, Ctrl+O, Ctrl+Z, Ctrl+click on sliders, Ctrl+C/V in text fields) is silently ignored.
+        private void SubmitImGuiModifiers()
+        {
+            if (_input.Keyboards.Count == 0) return;
+            var keyboard = _input.Keyboards[0];
+            var io = ImGui.GetIO();
+            io.AddKeyEvent(ImGuiModCtrl, keyboard.IsKeyPressed(Key.ControlLeft) || keyboard.IsKeyPressed(Key.ControlRight));
+            io.AddKeyEvent(ImGuiModShift, keyboard.IsKeyPressed(Key.ShiftLeft) || keyboard.IsKeyPressed(Key.ShiftRight));
+            io.AddKeyEvent(ImGuiModAlt, keyboard.IsKeyPressed(Key.AltLeft) || keyboard.IsKeyPressed(Key.AltRight));
+            io.AddKeyEvent(ImGuiModSuper, keyboard.IsKeyPressed(Key.SuperLeft) || keyboard.IsKeyPressed(Key.SuperRight));
+        }
+
         private void OnRender(double deltaTime)
         {
             _renderTime += (float)deltaTime;
@@ -524,11 +547,17 @@ namespace ef2dg
                 PushScene = PushScene,
                 PopScene = PopScene,
                 RequestSceneTransition = RequestSceneTransition,
-                Exit = _window.Close
+                Exit = () => _exitRequested = true
             };
 
             _editorUI.Draw(ctx);
             _imGuiController.Render();
+
+            if (_exitRequested)
+            {
+                _exitRequested = false;
+                _window.Close();
+            }
         }
 
         private void SynchronizeFramebuffers()
